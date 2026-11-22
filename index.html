@@ -100,6 +100,11 @@ main{padding-bottom:110px}
 .mk{width:auto}.mk button{flex:none;padding:0 14px}
 .stu{flex-wrap:nowrap}
 }
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px}.fg .w{grid-column:1/-1}
+img.av{object-fit:cover;background:var(--bg)}
+.pf,.pv{border-radius:50%;overflow:hidden;background:var(--bt);color:var(--br);display:grid;place-items:center;font:700 30px "Bricolage Grotesque",serif;flex:none}
+.pf{width:96px;height:96px}.pv{width:84px;height:84px}.pf img,.pv img{width:100%;height:100%;object-fit:cover}
+@media (min-width:900px){.fg{grid-template-columns:1fr 1fr 1fr}}
 @media print{.side,.top,.bnav,.save,.np{display:none!important}.wrap{margin:0}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
@@ -120,8 +125,8 @@ const TABS=[["dash","Home"],["take","Attendance"],["stu","Students"],["rep","Rep
 const SK="urlabari-attendance-v1";
 let db={students:{},att:{}};
 try{const r=JSON.parse(localStorage.getItem(SK));if(r&&r.students&&r.att)db=r}catch(e){}
-db.subjects=db.subjects||{};db.meta=db.meta||{};
-const save=()=>{try{localStorage.setItem(SK,JSON.stringify(db))}catch(e){}};
+db.subjects=db.subjects||{};db.meta=db.meta||{};db.tch=db.tch||{};
+const save=()=>{try{localStorage.setItem(SK,JSON.stringify(db))}catch(e){toast("Storage is full. Copy a backup and remove some photos.")}};
 try{const t=localStorage.getItem("urlabari-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
 const pd=n=>String(n).padStart(2,"0"),fmt=d=>`${d.getFullYear()}-${pd(d.getMonth()+1)}-${pd(d.getDate())}`;
 const TD=fmt(new Date());
@@ -153,7 +158,7 @@ return `<div class="bs"><select aria-label="${w} year" onchange="${f("this.value
 function setRep(w,y,m,d){y=+y;m=+m;const iso=fromBS(y,m,Math.min(+d,BSD[y][m]));if(iso){S[w]=iso>TD?TD:iso;S.csv="";render()}}
 function dcardOld(){const b=toBS(S.date)||{y:2083,m:0,d:1};const nd=BSD[b.y][b.m];
 return `<div class="full"><label>Date (BS and AD)</label><div class="bs"><select aria-label="BS year" onchange="setBS(this.value,${b.m},${b.d})">${Object.keys(BSD).map(y=>`<option ${+y===b.y?"selected":""}>${y}</option>`).join("")}</select><select aria-label="BS month" onchange="setBS(${b.y},this.value,${b.d})">${BSM.map((n,i)=>`<option value="${i}" ${i===b.m?"selected":""}>${n}</option>`).join("")}</select><select aria-label="BS day" onchange="setBS(${b.y},${b.m},this.value)">${Array.from({length:nd},(_,i)=>`<option ${i+1===b.d?"selected":""}>${i+1}</option>`).join("")}</select></div><div class="dt" style="margin-top:8px"><button aria-label="Previous day" onclick="shift(-1)">‹</button><input type="date" aria-label="AD date" value="${S.date}" max="${TD}" onchange="setDate(this.value)"><button aria-label="Next day" onclick="shift(1)">›</button></div><div class="cap">${bsLabel(S.date)}</div></div>`}
-const S={tab:"dash",prog:"BA",cls:"1st Year",date:TD,from:TD.slice(0,8)+"01",to:TD,q:"",d:{},del:null,csv:"",json:"",rs:false,xt:"class",xs:true,sub:""};
+const S={tab:"dash",prog:"BA",cls:"1st Year",date:TD,from:TD.slice(0,8)+"01",to:TD,q:"",d:{},del:null,csv:"",json:"",rs:false,xt:"class",xs:true,sub:"",sv:"class",fp:"",pid:null,f:null};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const K=(p=S.prog,c=S.cls)=>p+"|"+c;
@@ -163,7 +168,7 @@ const R=(k=AK(),d=S.date)=>(db.att[k]||{})[d]||{};
 const P=()=>PR.find(p=>p[0]===S.prog);
 const ini=n=>n.split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 const hue=n=>{let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))%360;return h};
-const av=n=>`<div class="av" style="background:hsl(${hue(n)} 45% 38%)">${esc(ini(n))}</div>`;
+const av=(n,ph)=>ph?`<img class="av" alt="" src="${ph}">`:`<div class="av" style="background:hsl(${hue(n)} 45% 38%)">${esc(ini(n))}</div>`;
 const svg=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
 const toast=m=>{$("#toast").innerHTML=`<div class="toast" role="status">${esc(m)}</div>`;setTimeout(()=>$("#toast").innerHTML="",2200)};
 const keep=f=>{const y=scrollY;f();scrollTo(0,y)};
@@ -171,7 +176,7 @@ const pct=c=>{const t=c.P+c.A+c.L;return t?Math.round((c.P+c.L)*100/t):null};
 function tally(k,id,ds){const c={P:0,A:0,L:0,E:0};ds.forEach(d=>{const v=((db.att[k]||{})[d]||{})[id];if(v)c[v]++});return c}
 const dates=(k,f,t)=>Object.keys(db.att[k]||{}).filter(d=>d>=f&&d<=t).sort();
 function ld(){S.d={...R()};S.del=null;S.q=""}
-function go(t){S.tab=t;S.csv="";S.q="";S.del=null;render();scrollTo(0,0)}
+function go(t){S.pid=null;S.f=null;S.tab=t;S.csv="";S.q="";S.del=null;render();scrollTo(0,0)}
 function pick(p,c){S.sub="";S.prog=p;S.cls=c||P()[2][0];ld();S.csv="";render()}
 function setDate(v){if(v){S.date=v>TD?TD:v;ld();render()}}
 function shift(n){const d=new Date(S.date+"T00:00");d.setDate(d.getDate()+n);setDate(fmt(d))}
@@ -194,8 +199,8 @@ L().forEach(s=>{const c=tally(k,s.id,ds);rows.push([s.roll,'"'+s.name.replace(/"
 return `Urlabari Multiple Campus,${S.prog} ${S.cls}${S.sub?" - "+S.sub:""},BS ${bsIso(S.from)} to ${bsIso(S.to)} (AD ${S.from} to ${S.to})\n`+rows.map(r=>r.join(",")).join("\n")}
 function copy(t,m){try{navigator.clipboard.writeText(t).then(()=>toast(m),()=>{})}catch(e){}}
 function theme(t){const r=document.documentElement;if(t==="auto")delete r.dataset.theme;else r.dataset.theme=t;try{t==="auto"?localStorage.removeItem("urlabari-theme"):localStorage.setItem("urlabari-theme",t)}catch(e){}}
-function restore(){try{const j=JSON.parse($("#rj").value);if(!j.students||!j.att)throw 0;db=j;db.subjects=db.subjects||{};db.meta=db.meta||{};save();ld();toast("Backup restored");render()}catch(e){toast("That backup is not valid")}}
-function wipe(){if(!S.rs){S.rs=true;render();return}db={students:{},att:{},subjects:{},meta:db.meta};save();S.rs=false;ld();toast("All data cleared");render()}
+function restore(){try{const j=JSON.parse($("#rj").value);if(!j.students||!j.att)throw 0;db=j;db.subjects=db.subjects||{};db.meta=db.meta||{};db.tch=db.tch||{};save();ld();toast("Backup restored");render()}catch(e){toast("That backup is not valid")}}
+function wipe(){if(!S.rs){S.rs=true;render();return}db={students:{},att:{},subjects:{},tch:{},meta:db.meta};save();S.rs=false;ld();toast("All data cleared");render()}
 
 function ctx(withDate,withSub){return `<div class="card np"><div class="ctx"><div><label for="pg">Program</label><select id="pg" onchange="pick(this.value)">${PR.map(p=>`<option ${p[0]===S.prog?"selected":""}>${p[0]}</option>`).join("")}</select></div>
 <div><label for="cl">${S.prog.startsWith("Level")?"Faculty":"Class"}</label><select id="cl" onchange="pick(S.prog,this.value)">${P()[2].map(c=>`<option ${c===S.cls?"selected":""}>${c}</option>`).join("")}</select></div>
@@ -211,9 +216,9 @@ return `<h1>Dashboard</h1><p class="mu" style="margin:0">Overview for the select
 <div class="card np"><div class="ctx">${dcard()}</div></div>
 <div class="kpis"><div class="kpi"><b>${t}</b><span>Total students</span></div><div class="kpi P"><b>${c.P+c.L}</b><span>Present (incl. late)</span></div><div class="kpi A"><b>${c.A}</b><span>Absent</span></div><div class="kpi L"><b>${c.L}</b><span>Late</span></div><div class="kpi"><b>${rate==null?"–":rate+"%"}</b><span>Attendance rate</span></div></div>
 <div class="card"><h2>Classes</h2>${t?`<div class="sc"><table><thead><tr><th>Class</th><th>Students</th><th>Present</th><th>Absent</th><th>Status</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>`:`<div class="empty">No students yet.<br><br><button class="btn" onclick="go('stu')">Add students</button></div>`}</div>
-<div class="card"><h2>Below 75% attendance</h2>${low.length?low.slice(0,10).map(x=>`<div class="stu">${av(x.s.name)}<div class="nm">${esc(x.s.name)}<small>${esc(x.p)} · ${esc(x.cl)}</small></div><span class="pill A">${x.q}%</span></div>`).join(""):`<p class="mu" style="margin:0">No students are below 75%, or fewer than 3 days are recorded.</p>`}</div>`}
+<div class="card"><h2>Below 75% attendance</h2>${low.length?low.slice(0,10).map(x=>`<div class="stu">${av(x.s.name,x.s.photo)}<div class="nm">${esc(x.s.name)}<small>${esc(x.p)} · ${esc(x.cl)}</small></div><span class="pill A">${x.q}%</span></div>`).join(""):`<p class="mu" style="margin:0">No students are below 75%, or fewer than 3 days are recorded.</p>`}</div>`}
 
-function vTake(){return `<h1>Take attendance</h1>`+ctx(true,true)+`<div class="card" id="tk"></div>`}
+function vTake(){return `<h1>Take attendance</h1>`+ctx(true,true)+tline()+`<div class="card" id="tk"></div>`}
 function fillTake(){
 const st=L(),q=S.q.toLowerCase(),c={P:0,A:0,L:0,E:0};st.forEach(s=>{if(S.d[s.id])c[S.d[s.id]]++});
 const u=st.length-c.P-c.A-c.L-c.E;
@@ -223,13 +228,35 @@ const was=Object.keys(R()).length?`<p class="mu" style="margin:0 0 8px">Attendan
 const rows=st.filter(s=>!q||s.name.toLowerCase().includes(q)||String(s.roll)===q);
 $("#tk").innerHTML=was+`<div class="row np" style="margin-bottom:6px"><div class="g"><input id="sq" type="search" placeholder="Search name or roll" value="${esc(S.q)}" oninput="S.q=this.value;fillRows()" aria-label="Search students"></div></div><div class="tw np" style="margin-bottom:6px"><button class="btn alt" onclick="markAll('P')">All present</button><button class="btn alt" onclick="clearAll()">Clear</button></div><div id="rw"></div>`;fillRows()}
 function fillRows(){const q=S.q.toLowerCase();const rows=L().filter(s=>!q||s.name.toLowerCase().includes(q)||String(s.roll)===q);
-$("#rw").innerHTML=rows.length?rows.map(s=>`<div class="stu">${av(s.name)}<div class="nm">${esc(s.name)}<small>Roll ${s.roll}</small></div><div class="mk">${[["P","Present"],["A","Absent"],["L","Late"],["E","Leave"]].map(([v,l])=>`<button class="${v} ${S.d[s.id]===v?"on":""}" aria-pressed="${S.d[s.id]===v}" onclick="mark('${s.id}','${v}')">${l}</button>`).join("")}</div></div>`).join(""):`<div class="empty">No match.</div>`}
+$("#rw").innerHTML=rows.length?rows.map(s=>`<div class="stu">${av(s.name,s.photo)}<div class="nm">${esc(s.name)}<small>Roll ${s.roll}</small></div><div class="mk">${[["P","Present"],["A","Absent"],["L","Late"],["E","Leave"]].map(([v,l])=>`<button class="${v} ${S.d[s.id]===v?"on":""}" aria-pressed="${S.d[s.id]===v}" onclick="mark('${s.id}','${v}')">${l}</button>`).join("")}</div></div>`).join(""):`<div class="empty">No match.</div>`}
 
-function vStu(){return `<h1>Students</h1>`+ctx(false)+`<div class="card np"><h2>Add a student</h2><div class="row"><div style="width:90px"><label for="rl">Roll</label><input id="rl" type="number" min="1" placeholder="Auto"></div><div class="g"><label for="nm">Full name</label><input id="nm" autocomplete="off"></div><div class="g"><label for="ph">Guardian phone</label><input id="ph" type="tel" placeholder="Optional"></div><button class="btn" onclick="addStu()">Add student</button></div></div>
-<div class="card np"><h2>Paste a class list</h2><label for="bk">One per line: “roll, name” or just the name</label><textarea id="bk" placeholder="1, Anita Rai&#10;2, Bikash Limbu&#10;Sunita Karki"></textarea><div style="margin-top:10px"><button class="btn" onclick="bulk()">Add list</button></div></div>${scard()}<div class="card"><h2>${esc(S.prog)} · ${esc(S.cls)} (${L().length})</h2><input id="sq" type="search" placeholder="Search name or roll" value="${esc(S.q)}" oninput="S.q=this.value;fill()" aria-label="Search students" style="margin-bottom:6px"><div id="rw"></div></div>`}
-function fill(){const k=K(),q=S.q.toLowerCase(),ds=dates(k,"0000","9999");const rows=L().filter(s=>!q||s.name.toLowerCase().includes(q)||String(s.roll)===q);
-$("#rw").innerHTML=rows.length?rows.map(s=>{const p=pct(tally(k,s.id,ds));return `<div class="stu">${av(s.name)}<div class="nm">${esc(s.name)}<small>Roll ${s.roll}${s.phone?" · "+esc(s.phone):""}${p==null?"":" · "+p+"% attendance"}</small></div><button class="btn ${S.del===s.id?"dg":"alt"}" onclick="del('${s.id}')">${S.del===s.id?"Confirm remove":"Remove"}</button></div>`}).join(""):`<div class="empty">No students yet.</div>`}
-
+function vStu(){
+if(S.pid)return vPort();
+if(S.f)return `<h1>${S.f.id?"Edit student":"Add student"}</h1>`+(S.f.id?"":ctx(false))+formHtml();
+if(S.sv==="all")return `<h1>All students</h1><div class="card np"><div class="fg"><div class="w"><label for="sq">Search</label><input id="sq" type="search" placeholder="Name, roll or phone" value="${esc(S.q)}" oninput="S.q=this.value;fill()"></div><div class="w"><label for="fp">Program</label><select id="fp" onchange="S.fp=this.value;fill()"><option value="">All programs</option>${PR.map(p=>`<option ${S.fp===p[0]?"selected":""}>${p[0]}</option>`).join("")}</select></div></div><div class="tw" style="margin-top:12px"><button class="btn alt" onclick="S.sv='class';S.q='';render()">Back to class view</button><button class="btn" onclick="xlStu(true)">Download all (Excel)</button></div></div><div class="card"><h2 id="cnt"></h2><div id="rw"></div></div>`;
+return `<h1>Students</h1>`+ctx(false)+`<div class="card np"><div class="tw"><button class="btn" onclick="openForm()">+ Add student</button><button class="btn alt" onclick="S.sv='all';S.q='';render()">All students</button></div><div style="margin-top:8px"><button class="btn alt" style="width:100%" onclick="xlStu(false)">Download this class (Excel)</button></div></div>
+<details class="card np"><summary style="cursor:pointer;font-weight:700">Paste a class list</summary><div style="margin-top:10px"><label for="bk">One per line: “roll, name” or just the name</label><textarea id="bk" placeholder="1, Anita Rai&#10;2, Bikash Limbu&#10;Sunita Karki"></textarea><div style="margin-top:10px"><button class="btn" onclick="bulk()">Add list</button></div></div></details>`+tcard()+`<div class="card"><h2>${esc(S.prog)} · ${esc(S.cls)} (${L().length})</h2><input id="sq" type="search" placeholder="Search name, roll or phone" value="${esc(S.q)}" oninput="S.q=this.value;fill()" aria-label="Search students" style="margin-bottom:6px"><div id="rw"></div></div>`}
+function fill(){if(!$("#rw"))return;const q=S.q.toLowerCase();let it=[];
+if(S.sv==="all")PR.forEach(p=>{if(S.fp&&p[0]!==S.fp)return;p[2].forEach(c=>L(K(p[0],c)).forEach(s=>it.push({s,p:p[0],c})))});
+else it=L().map(s=>({s,p:S.prog,c:S.cls}));
+it=it.filter(({s})=>!q||s.name.toLowerCase().includes(q)||String(s.roll)===q||(s.phone||"").includes(q)||(s.sphone||"").includes(q));
+if($("#cnt"))$("#cnt").textContent=it.length+" students";
+$("#rw").innerHTML=it.length?it.map(({s,p,c})=>{const k=K(p,c),pp=pct(tally(k,s.id,dates(k,"0000","9999")));
+return `<div class="stu"><button class="lk" style="display:flex;gap:10px;align-items:center;flex:1;min-width:0;color:var(--ink);font-weight:inherit" onclick="openPort('${s.id}','${p}','${c}')">${av(s.name,s.photo)}<span class="nm">${esc(s.name)}<small>${S.sv==="all"?esc(p)+" · "+esc(c)+" · ":""}Roll ${s.roll}${s.phone?" · "+esc(s.phone):""}${pp==null?"":" · "+pp+"%"}</small></span></button><span class="mu" aria-hidden="true">›</span></div>`}).join(""):`<div class="empty">No students found.</div>`}
+function vPort(){const k=K(),p=S.prog,c=S.cls,s=(db.students[k]||[]).find(x=>x.id===S.pid);
+if(!s){S.pid=null;return vStu()}
+const ds=dates(k,"0000","9999"),t=tally(k,s.id,ds),pc=pct(t),T=db.tch,sb=db.subjects[k]||[];
+const rows=[["Gender",s.gender],["Date of birth (BS)",s.dob],["Student phone",s.sphone],["Email",s.email],["Guardian",s.guardian],["Guardian phone",s.phone],["Address",s.address],["Registration no.",s.regNo]];
+const rec=ds.slice().reverse().filter(d=>db.att[k][d][s.id]).slice(0,30);
+const sr=sb.map(x=>{const ak=k+"#"+x,d2=dates(ak,"0000","9999"),t2=tally(ak,s.id,d2);return[x,T[ak]||"",t2,pct(t2),d2.length]}).filter(r=>r[4]);
+return `<p class="np" style="margin:0"><button class="lk" onclick="S.pid=null;render()">‹ Back to students</button></p>
+<div class="card" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><div class="pf">${s.photo?`<img src="${s.photo}" alt="Photo of ${esc(s.name)}">`:`<span>${esc(ini(s.name))}</span>`}</div><div style="flex:1;min-width:180px"><h1>${esc(s.name)}</h1><div class="mu">Roll ${s.roll} · ${esc(p)} · ${esc(c)}</div><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span class="pill">Faculty: ${esc(fac(p,c))}</span><span class="pill">${esc(LV(p))}</span></div></div><div style="text-align:center"><b style="font:700 32px 'Bricolage Grotesque',serif;color:${pc!=null&&pc<75?"var(--a)":"var(--p)"}">${pc==null?"–":pc+"%"}</b><div class="mu">Attendance</div></div></div>
+<div class="kpis"><div class="kpi P"><b>${t.P}</b><span>Present</span></div><div class="kpi A"><b>${t.A}</b><span>Absent</span></div><div class="kpi L"><b>${t.L}</b><span>Late</span></div><div class="kpi"><b>${t.E}</b><span>Leave</span></div><div class="kpi"><b>${ds.length}</b><span>Days recorded</span></div></div>
+<div class="card"><h2>Personal details</h2><div class="fg">${rows.map(([l,v])=>`<div><div class="mu">${l}</div><div style="font-weight:600;overflow-wrap:anywhere">${v?esc(v):"–"}</div></div>`).join("")}</div></div>
+<div class="card"><h2>Teachers</h2><div class="fg"><div><div class="mu">Faculty coordinator</div><b>${esc(T["fac:"+fac(p,c)]||"–")}</b></div><div><div class="mu">Class teacher</div><b>${esc(T[k]||"–")}</b></div></div></div>
+${sr.length?`<div class="card sc"><h2>Subject-wise attendance</h2><table><thead><tr><th>Subject</th><th>Teacher</th><th>P</th><th>A</th><th>L</th><th>%</th></tr></thead><tbody>${sr.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1]||"–")}</td><td>${r[2].P}</td><td>${r[2].A}</td><td>${r[2].L}</td><td><span class="pill ${r[3]!=null&&r[3]<75?"A":"P"}">${r[3]==null?"–":r[3]+"%"}</span></td></tr>`).join("")}</tbody></table></div>`:""}
+<div class="card"><h2>Recent attendance</h2>${rec.length?rec.map(d=>{const v=db.att[k][d][s.id];return `<div class="stu" style="padding:8px 0"><div class="nm">${esc(bsNp(d))}<small>${d}</small></div><span class="pill ${v}">${{P:"Present",A:"Absent",L:"Late",E:"Leave"}[v]}</span></div>`}).join(""):`<p class="mu" style="margin:0">No attendance recorded yet.</p>`}</div>
+<div class="card np"><div class="tw"><button class="btn" onclick="editCur()">Edit</button><button class="btn alt" onclick="print()">Print</button><button class="btn ${S.del===s.id?"dg":"alt"}" onclick="rmStu()">${S.del===s.id?"Confirm remove":"Remove"}</button></div></div>`}
 function vRep(){const k=AK(),ds=dates(k,S.from,S.to),st=L();
 const head=`<h1>Reports</h1>`+ctx(false,true)+`<div class="card np"><div class="row"><div class="g" style="min-width:240px"><label>From (BS)</label>${bsSel("from")}</div><div class="g" style="min-width:240px"><label>To (BS)</label>${bsSel("to")}</div></div><div class="tw" style="margin-top:10px"><button class="btn alt" onclick="S.csv=csv();copy(S.csv,'Copied. Paste into Excel or Sheets');render()">Copy for Excel</button><button class="btn alt" onclick="print()">Print</button></div></div>`;
 if(!st.length||!ds.length)return head+xcard()+`<div class="card empty">No attendance saved for this class in this period.</div>`;
@@ -270,7 +297,7 @@ const tot={P:0,A:0,L:0,E:0};st.forEach(s=>{const t=tally(ak,s.id,ds);for(const x
 return{p,c,sub,ak,st,ds,n:st.length,avg:pct(tot)??0,low:st.filter(s=>(pct(tally(ak,s.id,ds))??100)<75).length}}
 function sheet(wb,s){const{p,c,sub,ak,st,ds}=s,n=ds.length,C=n+7,pr=PR.find(x=>x[0]===p);
 const ws=wb.addWorksheet(uniq(wb,p+" "+c+(sub?" - "+sub:"")),{views:[{state:"frozen",xSplit:2}],pageSetup:PS});
-let r=heading(ws,C,"Attendance Report  |  उपस्थिति प्रतिवेदन",[`Level: ${LV(p)}   |   Program: ${p} – ${pr[1]}`,`Faculty: ${fac(p,c)}   |   Class: ${c}`,`Subject: ${sub||"Daily attendance (whole class)"}`,per()])+1;
+let r=heading(ws,C,"Attendance Report  |  उपस्थिति प्रतिवेदन",[`Level: ${LV(p)}   |   Program: ${p} – ${pr[1]}`,`Faculty: ${fac(p,c)}${tn("fac:"+fac(p,c),"Coordinator")}   |   Class: ${c}${tn(K(p,c),"Class teacher")}`,`Subject: ${sub||"Daily attendance (whole class)"}${sub?tn(K(p,c)+"#"+sub,"Teacher"):""}`,per()])+1;
 const H=["Roll","Student Name",...ds.map(d=>{const b=toBS(d),a=new Date(d+"T00:00:00Z");return(b?`${dn(b.d)} ${BSN[b.m]}`:d.slice(5))+"\n"+a.getUTCDate()+" "+MON[a.getUTCMonth()]}),"Present","Absent","Late","Leave","Attendance %"];
 H.forEach((h,i)=>hcell(ws,r,i+1,h));ws.getRow(r).height=42;const hr=r;
 const l1=ws.getColumn(3).letter,l2=ws.getColumn(2+n).letter,lp=ws.getColumn(3+n).letter,la=ws.getColumn(4+n).letter,ll=ws.getColumn(5+n).letter;
@@ -322,6 +349,58 @@ function addSub(){const v=$("#sb").value.trim();if(!v){toast("Enter a subject na
 function delSub(i){const k=K(),s=db.subjects[k][i];db.subjects[k].splice(i,1);if(S.sub===s)S.sub="";save();render()}
 function mcard(){const M=meta();return `<div class="card"><h2>College details for Excel reports</h2><div style="display:grid;gap:10px"><div><label for="m1">College name (Nepali)</label><input id="m1" value="${esc(M.np)}"></div><div><label for="m2">College name (English)</label><input id="m2" value="${esc(M.en)}"></div><div><label for="m3">Address</label><input id="m3" value="${esc(M.addr)}"></div><div><button class="btn" onclick="saveMeta()">Save details</button></div></div></div>`}
 function saveMeta(){db.meta={np:$("#m1").value.trim()||DEF.np,en:$("#m2").value.trim()||DEF.en,addr:$("#m3").value.trim()||DEF.addr};save();toast("Details saved")}
+const tn=(key,lab)=>db.tch[key]?`  (${lab}: ${db.tch[key]})`:"";
+const blankF=()=>({id:null,roll:Math.max(0,...(db.students[K()]||[]).map(s=>s.roll))+1,name:"",gender:"",dob:"",sphone:"",email:"",guardian:"",phone:"",address:"",regNo:"",photo:""});
+function openForm(s){S.f=s?{...s}:blankF();render();scrollTo(0,0)}
+function editCur(){const s=(db.students[K()]||[]).find(x=>x.id===S.pid);if(s)openForm(s)}
+function openPort(id,p,c){S.prog=p;S.cls=c;S.sub="";ld();S.pid=id;S.f=null;render();scrollTo(0,0)}
+const fset=(k,v)=>{S.f[k]=v};
+function pickPhoto(inp){const file=inp.files&&inp.files[0];if(!file)return;const rd=new FileReader();
+rd.onload=()=>{const img=new Image();img.onload=()=>{const z=140,cv=document.createElement("canvas");cv.width=cv.height=z;const m=Math.min(img.width,img.height);cv.getContext("2d").drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,z,z);S.f.photo=cv.toDataURL("image/jpeg",.7);render()};img.onerror=()=>toast("Could not read that image");img.src=rd.result};
+rd.onerror=()=>toast("Could not read that file");rd.readAsDataURL(file)}
+function formHtml(){const f=S.f,E=v=>esc(v==null?"":v);
+const I=(k,l,t,ph,w)=>`<div class="${w?"w":""}"><label for="f_${k}">${l}</label><input id="f_${k}" type="${t||"text"}" value="${E(f[k])}" placeholder="${ph||""}" autocomplete="off" oninput="fset('${k}',this.value)"></div>`;
+return `<div class="card"><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:14px"><div class="pv">${f.photo?`<img src="${f.photo}" alt="">`:`<span>${esc(ini(f.name||"?"))}</span>`}</div><div><label class="btn alt" style="display:inline-flex;align-items:center;margin:0;cursor:pointer">${f.photo?"Change photo":"Add photo"}<input type="file" accept="image/*" hidden onchange="pickPhoto(this)"></label>${f.photo?` <button class="lk" onclick="fset('photo','');render()">Remove</button>`:""}<div class="mu" style="margin-top:4px">Optional. The photo is resized and kept in this browser.</div></div></div>
+<div class="fg">${I("name","Full name *","text","","w")}${I("roll","Roll no.","number")}<div><label for="f_gender">Gender</label><select id="f_gender" onchange="fset('gender',this.value)">${["","Male","Female","Other"].map(g=>`<option value="${g}" ${f.gender===g?"selected":""}>${g||"Select"}</option>`).join("")}</select></div>${I("dob","Date of birth (BS)","text","e.g. 2062-05-12")}${I("regNo","Registration no.")}${I("sphone","Student phone","tel")}${I("email","Email","email")}${I("guardian","Guardian name")}${I("phone","Guardian phone","tel")}${I("address","Address","text","Ward, municipality, district","w")}</div>
+<div class="tw" style="margin-top:14px"><button class="btn" onclick="saveStu(false)">${f.id?"Save changes":"Save student"}</button>${f.id?"":`<button class="btn alt" onclick="saveStu(true)">Save and add another</button>`}<button class="btn alt" onclick="S.f=null;render()">Cancel</button></div></div>`}
+function saveStu(again){const f=S.f;f.name=(f.name||"").trim();if(!f.name){toast("Enter the student’s name");return}
+const k=K();db.students[k]=db.students[k]||[];const r=parseInt(f.roll,10)||Math.max(0,...db.students[k].map(s=>s.roll))+1;
+if(db.students[k].some(s=>s.roll===r&&s.id!==f.id)){toast("Roll "+r+" is already used in this class");return}
+const o={...f,roll:r};
+if(f.id){db.students[k][db.students[k].findIndex(s=>s.id===f.id)]=o}else{o.id="s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);db.students[k].push(o)}
+save();toast(f.id?"Student updated":"Student added");S.f=f.id||!again?null:blankF();render();scrollTo(0,0)}
+function rmStu(){if(S.del!==S.pid){S.del=S.pid;render();return}const k=K();db.students[k]=db.students[k].filter(s=>s.id!==S.pid);
+Object.keys(db.att).filter(x=>x===k||x.startsWith(k+"#")).forEach(a=>Object.values(db.att[a]).forEach(d=>delete d[S.pid]));S.pid=null;S.del=null;save();toast("Student removed");render()}
+function setT(key,v){v=v.trim();if(v)db.tch[key]=v;else delete db.tch[key];save();toast("Saved")}
+function setTS(i,v){const k=K();setT(k+"#"+db.subjects[k][i],v)}
+function addSub(){const v=$("#sb").value.trim();if(!v){toast("Enter a subject name");return}const k=K();db.subjects[k]=db.subjects[k]||[];if(db.subjects[k].includes(v)){toast("Subject already added");return}
+db.subjects[k].push(v);const t=$("#sbt").value.trim();if(t)db.tch[k+"#"+v]=t;save();render();toast("Subject added")}
+function delSub(i){const k=K(),s=db.subjects[k][i];db.subjects[k].splice(i,1);delete db.tch[k+"#"+s];if(S.sub===s)S.sub="";save();render()}
+function tcard(){const k=K(),f="fac:"+fac(S.prog,S.cls),sb=db.subjects[k]||[],T=db.tch;
+return `<details class="card np"><summary style="cursor:pointer;font-weight:700">Teachers and subjects</summary><div style="margin-top:12px"><div class="fg"><div><label for="t1">Faculty coordinator (${esc(fac(S.prog,S.cls))})</label><input id="t1" value="${esc(T[f]||"")}" onchange="setT('${f}',this.value)"></div><div><label for="t2">Class teacher</label><input id="t2" value="${esc(T[k]||"")}" onchange="setT('${k}',this.value)"></div></div>
+<h2 style="margin:16px 0 8px">Subjects</h2>${sb.map((s,i)=>`<div class="row" style="margin-bottom:8px;flex-wrap:nowrap;align-items:center"><div style="flex:1;font-weight:600;overflow-wrap:anywhere">${esc(s)}</div><div style="flex:1.4"><input aria-label="Teacher for ${esc(s)}" placeholder="Subject teacher" value="${esc(T[k+"#"+s]||"")}" onchange="setTS(${i},this.value)"></div><button class="btn alt" style="padding:10px 14px" aria-label="Remove ${esc(s)}" onclick="delSub(${i})">×</button></div>`).join("")}
+<div class="row" style="margin-top:8px"><div class="g"><label for="sb">New subject</label><input id="sb" autocomplete="off" placeholder="e.g. Nepali, Accountancy"></div><div class="g"><label for="sbt">Subject teacher</label><input id="sbt" autocomplete="off" placeholder="Optional"></div><button class="btn" onclick="addSub()">Add subject</button></div></div></details>`}
+function tline(){const k=K(),a=[],T=db.tch;if(T["fac:"+fac(S.prog,S.cls)])a.push("Faculty coordinator: "+T["fac:"+fac(S.prog,S.cls)]);if(T[k])a.push("Class teacher: "+T[k]);if(S.sub&&T[k+"#"+S.sub])a.push("Subject teacher: "+T[k+"#"+S.sub]);return a.length?`<p class="mu np" style="margin:8px 0 0">${esc(a.join("  ·  "))}</p>`:""}
+async function xlStu(all){
+if(typeof ExcelJS==="undefined"){toast("Excel library did not load. Check your internet");return}
+const it=[];PR.forEach(p=>p[2].forEach(c=>{if(!all&&(p[0]!==S.prog||c!==S.cls))return;L(K(p[0],c)).forEach(s=>it.push({s,p:p[0],c}))}));
+if(!it.length){toast("No students to export");return}
+try{const wb=new ExcelJS.Workbook();wb.creator=meta().en;
+const ws=wb.addWorksheet(all?"All students":uniq(wb,S.prog+" "+S.cls),{pageSetup:PS,views:[{state:"frozen",xSplit:3}]});
+const H=["Photo","Roll","Student Name","Gender","Date of Birth (BS)","Program","Faculty","Class","Student Phone","Email","Guardian","Guardian Phone","Address","Reg. No.","Attendance %"],C=H.length;
+let r=heading(ws,C,"Student Data  |  विद्यार्थी विवरण",all?[`All programs and classes   |   Total students: ${it.length}`]:[`Level: ${LV(S.prog)}   |   Program: ${S.prog}${tn("fac:"+fac(S.prog,S.cls),"Faculty coordinator")}`,`Faculty: ${fac(S.prog,S.cls)}   |   Class: ${S.cls}${tn(K(),"Class teacher")}   |   Total students: ${it.length}`])+1;
+H.forEach((h,i)=>hcell(ws,r,i+1,h));ws.getRow(r).height=30;
+it.forEach(({s,p,c})=>{r++;ws.getRow(r).height=s.photo?58:24;const k=K(p,c),pp=pct(tally(k,s.id,dates(k,"0000","9999")));
+[null,s.roll,s.name,s.gender,s.dob,p,fac(p,c),c,s.sphone,s.email,s.guardian,s.phone,s.address,s.regNo,pp==null?"":pp].forEach((v,i)=>{const cell=ws.getCell(r,i+1);
+if(typeof v==="number"){cell.value=v;cell.font={name:FP,size:10}}else if(v)cell.value=rt(v,10,false);
+if(i===14&&v!=="")cell.numFmt='0"%"';cell.alignment={vertical:"middle",horizontal:(i===1||i===14)?"center":"left",wrapText:i===12};cell.border=BR});
+if(s.photo){const id=wb.addImage({base64:s.photo,extension:"jpeg"});ws.addImage(id,{tl:{col:0.1,row:r-1+0.05},ext:{width:52,height:52}})}});
+[10,7,26,10,16,10,15,14,15,24,22,15,30,12,13].forEach((w,i)=>ws.getColumn(i+1).width=w);
+r+=2;mid(ws,C,r,`Generated on ${TD} AD (${bsNp(TD)} BS)`,9,false,"FF5B6D75");
+const buf=await wb.xlsx.writeBuffer(),cl=window.claude,dl=cl?await cl.use("downloads"):null;
+if(!dl){toast("Downloads are not available in this view");return}
+await dl.save({filename:`Urlabari-Students-${all?"All":S.prog+"-"+S.cls}.xlsx`.replace(/\s+/g,"-"),data:new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})});
+toast("Excel file saved")}catch(e){toast(e&&e.code==="declined"?"Download cancelled":"Could not create the Excel file")}}
 function render(){
 const nav=([id,l])=>`<button aria-current="${S.tab===id?"page":"false"}" onclick="go('${id}')">${svg(id)}<span>${l}</span></button>`;
 $("#side").innerHTML=`<div class="brand"><div class="logo">U</div><div><b>Urlabari Multiple Campus</b><span class="mu">Attendance register</span></div></div>`+TABS.map(nav).join("");
