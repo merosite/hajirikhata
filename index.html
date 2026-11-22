@@ -102,6 +102,7 @@ main{padding-bottom:110px}
 }
 @media print{.side,.top,.bnav,.save,.np{display:none!important}.wrap{margin:0}}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 </head>
 <body>
 <aside class="side" id="side"></aside>
@@ -119,6 +120,7 @@ const TABS=[["dash","Home"],["take","Attendance"],["stu","Students"],["rep","Rep
 const SK="urlabari-attendance-v1";
 let db={students:{},att:{}};
 try{const r=JSON.parse(localStorage.getItem(SK));if(r&&r.students&&r.att)db=r}catch(e){}
+db.subjects=db.subjects||{};db.meta=db.meta||{};
 const save=()=>{try{localStorage.setItem(SK,JSON.stringify(db))}catch(e){}};
 try{const t=localStorage.getItem("urlabari-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
 const pd=n=>String(n).padStart(2,"0"),fmt=d=>`${d.getFullYear()}-${pd(d.getMonth()+1)}-${pd(d.getDate())}`;
@@ -151,12 +153,13 @@ return `<div class="bs"><select aria-label="${w} year" onchange="${f("this.value
 function setRep(w,y,m,d){y=+y;m=+m;const iso=fromBS(y,m,Math.min(+d,BSD[y][m]));if(iso){S[w]=iso>TD?TD:iso;S.csv="";render()}}
 function dcardOld(){const b=toBS(S.date)||{y:2083,m:0,d:1};const nd=BSD[b.y][b.m];
 return `<div class="full"><label>Date (BS and AD)</label><div class="bs"><select aria-label="BS year" onchange="setBS(this.value,${b.m},${b.d})">${Object.keys(BSD).map(y=>`<option ${+y===b.y?"selected":""}>${y}</option>`).join("")}</select><select aria-label="BS month" onchange="setBS(${b.y},this.value,${b.d})">${BSM.map((n,i)=>`<option value="${i}" ${i===b.m?"selected":""}>${n}</option>`).join("")}</select><select aria-label="BS day" onchange="setBS(${b.y},${b.m},this.value)">${Array.from({length:nd},(_,i)=>`<option ${i+1===b.d?"selected":""}>${i+1}</option>`).join("")}</select></div><div class="dt" style="margin-top:8px"><button aria-label="Previous day" onclick="shift(-1)">‹</button><input type="date" aria-label="AD date" value="${S.date}" max="${TD}" onchange="setDate(this.value)"><button aria-label="Next day" onclick="shift(1)">›</button></div><div class="cap">${bsLabel(S.date)}</div></div>`}
-const S={tab:"dash",prog:"BA",cls:"1st Year",date:TD,from:TD.slice(0,8)+"01",to:TD,q:"",d:{},del:null,csv:"",json:"",rs:false};
+const S={tab:"dash",prog:"BA",cls:"1st Year",date:TD,from:TD.slice(0,8)+"01",to:TD,q:"",d:{},del:null,csv:"",json:"",rs:false,xt:"class",xs:true,sub:""};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const K=(p=S.prog,c=S.cls)=>p+"|"+c;
 const L=(k=K())=>(db.students[k]||[]).slice().sort((a,b)=>a.roll-b.roll);
-const R=(k=K(),d=S.date)=>(db.att[k]||{})[d]||{};
+const AK=()=>S.sub?K()+"#"+S.sub:K();
+const R=(k=AK(),d=S.date)=>(db.att[k]||{})[d]||{};
 const P=()=>PR.find(p=>p[0]===S.prog);
 const ini=n=>n.split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
 const hue=n=>{let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))%360;return h};
@@ -169,14 +172,14 @@ function tally(k,id,ds){const c={P:0,A:0,L:0,E:0};ds.forEach(d=>{const v=((db.at
 const dates=(k,f,t)=>Object.keys(db.att[k]||{}).filter(d=>d>=f&&d<=t).sort();
 function ld(){S.d={...R()};S.del=null;S.q=""}
 function go(t){S.tab=t;S.csv="";S.q="";S.del=null;render();scrollTo(0,0)}
-function pick(p,c){S.prog=p;S.cls=c||P()[2][0];ld();S.csv="";render()}
+function pick(p,c){S.sub="";S.prog=p;S.cls=c||P()[2][0];ld();S.csv="";render()}
 function setDate(v){if(v){S.date=v>TD?TD:v;ld();render()}}
 function shift(n){const d=new Date(S.date+"T00:00");d.setDate(d.getDate()+n);setDate(fmt(d))}
-function openCls(p,c){S.prog=p;S.cls=c;ld();go("take")}
+function openCls(p,c){S.sub="";S.prog=p;S.cls=c;ld();go("take")}
 function mark(id,v){if(S.d[id]===v)delete S.d[id];else S.d[id]=v;keep(render)}
 function markAll(v){L().forEach(s=>S.d[s.id]=v);keep(render)}
 function clearAll(){S.d={};keep(render)}
-function saveAtt(){const k=K();db.att[k]=db.att[k]||{};if(Object.keys(S.d).length)db.att[k][S.date]={...S.d};else delete db.att[k][S.date];save();toast("Attendance saved");render()}
+function saveAtt(){const k=AK();db.att[k]=db.att[k]||{};if(Object.keys(S.d).length)db.att[k][S.date]={...S.d};else delete db.att[k][S.date];save();toast("Attendance saved");render()}
 function addStu(){const n=$("#nm").value.trim();if(!n){toast("Enter the student’s name");return}
 const k=K();db.students[k]=db.students[k]||[];const r=parseInt($("#rl").value,10);
 db.students[k].push({id:"s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),roll:r>0?r:Math.max(0,...db.students[k].map(s=>s.roll))+1,name:n,phone:$("#ph").value.trim()});
@@ -186,17 +189,17 @@ const k=K();db.students[k]=db.students[k]||[];let nx=Math.max(0,...db.students[k
 ls.forEach((l,i)=>{const m=l.match(/^(\d+)\s*[,\t.\-]\s*(.+)$/);const r=m?+m[1]:nx;if(r>=nx)nx=r+1;db.students[k].push({id:"s"+Date.now().toString(36)+i+Math.random().toString(36).slice(2,4),roll:r,name:m?m[2]:l,phone:""})});
 save();render();toast(ls.length+" students added")}
 function del(id){if(S.del!==id){S.del=id;fill();return}const k=K();db.students[k]=db.students[k].filter(s=>s.id!==id);Object.values(db.att[k]||{}).forEach(d=>delete d[id]);S.del=null;save();render()}
-function csv(){const k=K(),ds=dates(k,S.from,S.to);const rows=[["Roll","Name",...ds.map(bsIso),"Present","Absent","Late","Leave","Attendance %"]];
+function csv(){const k=AK(),ds=dates(k,S.from,S.to);const rows=[["Roll","Name",...ds.map(bsIso),"Present","Absent","Late","Leave","Attendance %"]];
 L().forEach(s=>{const c=tally(k,s.id,ds);rows.push([s.roll,'"'+s.name.replace(/"/g,'""')+'"',...ds.map(d=>db.att[k][d][s.id]||"-"),c.P,c.A,c.L,c.E,pct(c)==null?"":pct(c)])});
-return `Urlabari Multiple Campus,${S.prog} ${S.cls},BS ${bsIso(S.from)} to ${bsIso(S.to)} (AD ${S.from} to ${S.to})\n`+rows.map(r=>r.join(",")).join("\n")}
+return `Urlabari Multiple Campus,${S.prog} ${S.cls}${S.sub?" - "+S.sub:""},BS ${bsIso(S.from)} to ${bsIso(S.to)} (AD ${S.from} to ${S.to})\n`+rows.map(r=>r.join(",")).join("\n")}
 function copy(t,m){try{navigator.clipboard.writeText(t).then(()=>toast(m),()=>{})}catch(e){}}
 function theme(t){const r=document.documentElement;if(t==="auto")delete r.dataset.theme;else r.dataset.theme=t;try{t==="auto"?localStorage.removeItem("urlabari-theme"):localStorage.setItem("urlabari-theme",t)}catch(e){}}
-function restore(){try{const j=JSON.parse($("#rj").value);if(!j.students||!j.att)throw 0;db=j;save();ld();toast("Backup restored");render()}catch(e){toast("That backup is not valid")}}
-function wipe(){if(!S.rs){S.rs=true;render();return}db={students:{},att:{}};save();S.rs=false;ld();toast("All data cleared");render()}
+function restore(){try{const j=JSON.parse($("#rj").value);if(!j.students||!j.att)throw 0;db=j;db.subjects=db.subjects||{};db.meta=db.meta||{};save();ld();toast("Backup restored");render()}catch(e){toast("That backup is not valid")}}
+function wipe(){if(!S.rs){S.rs=true;render();return}db={students:{},att:{},subjects:{},meta:db.meta};save();S.rs=false;ld();toast("All data cleared");render()}
 
-function ctx(withDate){return `<div class="card np"><div class="ctx"><div><label for="pg">Program</label><select id="pg" onchange="pick(this.value)">${PR.map(p=>`<option ${p[0]===S.prog?"selected":""}>${p[0]}</option>`).join("")}</select></div>
+function ctx(withDate,withSub){return `<div class="card np"><div class="ctx"><div><label for="pg">Program</label><select id="pg" onchange="pick(this.value)">${PR.map(p=>`<option ${p[0]===S.prog?"selected":""}>${p[0]}</option>`).join("")}</select></div>
 <div><label for="cl">${S.prog.startsWith("Level")?"Faculty":"Class"}</label><select id="cl" onchange="pick(S.prog,this.value)">${P()[2].map(c=>`<option ${c===S.cls?"selected":""}>${c}</option>`).join("")}</select></div>
-${withDate?dcard():""}</div></div>`}
+${withSub?subSel():""}${withDate?dcard():""}</div></div>`}
 
 function vDash(){
 let t=0,c={P:0,A:0,L:0,E:0},rows=[],low=[];
@@ -210,7 +213,7 @@ return `<h1>Dashboard</h1><p class="mu" style="margin:0">Overview for the select
 <div class="card"><h2>Classes</h2>${t?`<div class="sc"><table><thead><tr><th>Class</th><th>Students</th><th>Present</th><th>Absent</th><th>Status</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>`:`<div class="empty">No students yet.<br><br><button class="btn" onclick="go('stu')">Add students</button></div>`}</div>
 <div class="card"><h2>Below 75% attendance</h2>${low.length?low.slice(0,10).map(x=>`<div class="stu">${av(x.s.name)}<div class="nm">${esc(x.s.name)}<small>${esc(x.p)} · ${esc(x.cl)}</small></div><span class="pill A">${x.q}%</span></div>`).join(""):`<p class="mu" style="margin:0">No students are below 75%, or fewer than 3 days are recorded.</p>`}</div>`}
 
-function vTake(){return `<h1>Take attendance</h1>`+ctx(true)+`<div class="card" id="tk"></div>`}
+function vTake(){return `<h1>Take attendance</h1>`+ctx(true,true)+`<div class="card" id="tk"></div>`}
 function fillTake(){
 const st=L(),q=S.q.toLowerCase(),c={P:0,A:0,L:0,E:0};st.forEach(s=>{if(S.d[s.id])c[S.d[s.id]]++});
 const u=st.length-c.P-c.A-c.L-c.E;
@@ -223,23 +226,102 @@ function fillRows(){const q=S.q.toLowerCase();const rows=L().filter(s=>!q||s.nam
 $("#rw").innerHTML=rows.length?rows.map(s=>`<div class="stu">${av(s.name)}<div class="nm">${esc(s.name)}<small>Roll ${s.roll}</small></div><div class="mk">${[["P","Present"],["A","Absent"],["L","Late"],["E","Leave"]].map(([v,l])=>`<button class="${v} ${S.d[s.id]===v?"on":""}" aria-pressed="${S.d[s.id]===v}" onclick="mark('${s.id}','${v}')">${l}</button>`).join("")}</div></div>`).join(""):`<div class="empty">No match.</div>`}
 
 function vStu(){return `<h1>Students</h1>`+ctx(false)+`<div class="card np"><h2>Add a student</h2><div class="row"><div style="width:90px"><label for="rl">Roll</label><input id="rl" type="number" min="1" placeholder="Auto"></div><div class="g"><label for="nm">Full name</label><input id="nm" autocomplete="off"></div><div class="g"><label for="ph">Guardian phone</label><input id="ph" type="tel" placeholder="Optional"></div><button class="btn" onclick="addStu()">Add student</button></div></div>
-<div class="card np"><h2>Paste a class list</h2><label for="bk">One per line: “roll, name” or just the name</label><textarea id="bk" placeholder="1, Anita Rai&#10;2, Bikash Limbu&#10;Sunita Karki"></textarea><div style="margin-top:10px"><button class="btn" onclick="bulk()">Add list</button></div></div><div class="card"><h2>${esc(S.prog)} · ${esc(S.cls)} (${L().length})</h2><input id="sq" type="search" placeholder="Search name or roll" value="${esc(S.q)}" oninput="S.q=this.value;fill()" aria-label="Search students" style="margin-bottom:6px"><div id="rw"></div></div>`}
+<div class="card np"><h2>Paste a class list</h2><label for="bk">One per line: “roll, name” or just the name</label><textarea id="bk" placeholder="1, Anita Rai&#10;2, Bikash Limbu&#10;Sunita Karki"></textarea><div style="margin-top:10px"><button class="btn" onclick="bulk()">Add list</button></div></div>${scard()}<div class="card"><h2>${esc(S.prog)} · ${esc(S.cls)} (${L().length})</h2><input id="sq" type="search" placeholder="Search name or roll" value="${esc(S.q)}" oninput="S.q=this.value;fill()" aria-label="Search students" style="margin-bottom:6px"><div id="rw"></div></div>`}
 function fill(){const k=K(),q=S.q.toLowerCase(),ds=dates(k,"0000","9999");const rows=L().filter(s=>!q||s.name.toLowerCase().includes(q)||String(s.roll)===q);
 $("#rw").innerHTML=rows.length?rows.map(s=>{const p=pct(tally(k,s.id,ds));return `<div class="stu">${av(s.name)}<div class="nm">${esc(s.name)}<small>Roll ${s.roll}${s.phone?" · "+esc(s.phone):""}${p==null?"":" · "+p+"% attendance"}</small></div><button class="btn ${S.del===s.id?"dg":"alt"}" onclick="del('${s.id}')">${S.del===s.id?"Confirm remove":"Remove"}</button></div>`}).join(""):`<div class="empty">No students yet.</div>`}
 
-function vRep(){const k=K(),ds=dates(k,S.from,S.to),st=L();
-const head=`<h1>Reports</h1>`+ctx(false)+`<div class="card np"><div class="row"><div class="g" style="min-width:240px"><label>From (BS)</label>${bsSel("from")}</div><div class="g" style="min-width:240px"><label>To (BS)</label>${bsSel("to")}</div></div><div class="tw" style="margin-top:10px"><button class="btn alt" onclick="S.csv=csv();copy(S.csv,'Copied. Paste into Excel or Sheets');render()">Copy for Excel</button><button class="btn alt" onclick="print()">Print</button></div></div>`;
-if(!st.length||!ds.length)return head+`<div class="card empty">No attendance saved for this class in this period.</div>`;
+function vRep(){const k=AK(),ds=dates(k,S.from,S.to),st=L();
+const head=`<h1>Reports</h1>`+ctx(false,true)+`<div class="card np"><div class="row"><div class="g" style="min-width:240px"><label>From (BS)</label>${bsSel("from")}</div><div class="g" style="min-width:240px"><label>To (BS)</label>${bsSel("to")}</div></div><div class="tw" style="margin-top:10px"><button class="btn alt" onclick="S.csv=csv();copy(S.csv,'Copied. Paste into Excel or Sheets');render()">Copy for Excel</button><button class="btn alt" onclick="print()">Print</button></div></div>`;
+if(!st.length||!ds.length)return head+xcard()+`<div class="card empty">No attendance saved for this class in this period.</div>`;
 let tot={P:0,A:0,L:0,E:0};st.forEach(s=>{const c=tally(k,s.id,ds);for(const x in c)tot[x]+=c[x]});
-return head+(S.csv?`<div class="card np"><label for="cv">Select all and copy</label><textarea id="cv" readonly>${esc(S.csv)}</textarea></div>`:"")+`<div class="kpis"><div class="kpi"><b>${ds.length}</b><span>Days recorded</span></div><div class="kpi"><b>${pct(tot)}%</b><span>Class average</span></div><div class="kpi A"><b>${st.filter(s=>pct(tally(k,s.id,ds))<75).length}</b><span>Below 75%</span></div></div>
-<div class="card sc"><h2>${esc(S.prog)} · ${esc(S.cls)}</h2><table><thead><tr><th>Student</th>${ds.map(d=>`<th title="${d}">${bsShort(d)}</th>`).join("")}<th>P</th><th>A</th><th>L</th><th>Lv</th><th>%</th></tr></thead><tbody>${st.map(s=>{const c=tally(k,s.id,ds),p=pct(c);return `<tr><td>${s.roll}. ${esc(s.name)}</td>${ds.map(d=>{const v=db.att[k][d][s.id]||"";return `<td class="${v}">${v||"–"}</td>`}).join("")}<td>${c.P}</td><td>${c.A}</td><td>${c.L}</td><td>${c.E}</td><td><span class="pill ${p!=null&&p<75?"A":"P"}">${p==null?"–":p+"%"}</span></td></tr>`}).join("")}</tbody></table><p class="mu">P present, A absent, L late, Lv leave. Late counts as present; leave days are left out of the percentage.</p></div>`}
+return head+xcard()+(S.csv?`<div class="card np"><label for="cv">Select all and copy</label><textarea id="cv" readonly>${esc(S.csv)}</textarea></div>`:"")+`<div class="kpis"><div class="kpi"><b>${ds.length}</b><span>Days recorded</span></div><div class="kpi"><b>${pct(tot)}%</b><span>Class average</span></div><div class="kpi A"><b>${st.filter(s=>pct(tally(k,s.id,ds))<75).length}</b><span>Below 75%</span></div></div>
+<div class="card sc"><h2>${esc(S.prog)} · ${esc(S.cls)}${S.sub?" · "+esc(S.sub):""}</h2><table><thead><tr><th>Student</th>${ds.map(d=>`<th title="${d}">${bsShort(d)}</th>`).join("")}<th>P</th><th>A</th><th>L</th><th>Lv</th><th>%</th></tr></thead><tbody>${st.map(s=>{const c=tally(k,s.id,ds),p=pct(c);return `<tr><td>${s.roll}. ${esc(s.name)}</td>${ds.map(d=>{const v=db.att[k][d][s.id]||"";return `<td class="${v}">${v||"–"}</td>`}).join("")}<td>${c.P}</td><td>${c.A}</td><td>${c.L}</td><td>${c.E}</td><td><span class="pill ${p!=null&&p<75?"A":"P"}">${p==null?"–":p+"%"}</span></td></tr>`}).join("")}</tbody></table><p class="mu">P present, A absent, L late, Lv leave. Late counts as present; leave days are left out of the percentage.</p></div>`}
 
 function vSet(){const th=document.documentElement.dataset.theme||"auto";const bk=JSON.stringify(db);
-return `<h1>Settings</h1><div class="card"><h2>Appearance</h2><div class="tw">${["auto","light","dark"].map(t=>`<button class="btn ${th===t?"":"alt"}" onclick="theme('${t}');render()">${t[0].toUpperCase()+t.slice(1)}</button>`).join("")}</div></div>
+return `<h1>Settings</h1>${mcard()}<div class="card"><h2>Appearance</h2><div class="tw">${["auto","light","dark"].map(t=>`<button class="btn ${th===t?"":"alt"}" onclick="theme('${t}');render()">${t[0].toUpperCase()+t.slice(1)}</button>`).join("")}</div></div>
 <div class="card"><h2>Backup</h2><p class="mu" style="margin-top:0">Records live in this browser only. Copy a backup regularly and keep it somewhere safe.</p><button class="btn" onclick="copy(db_json(),'Backup copied')">Copy backup</button><div style="margin-top:14px"><label for="rj">Restore from backup</label><textarea id="rj" placeholder="Paste a backup here"></textarea><div style="margin-top:10px"><button class="btn alt" onclick="restore()">Restore backup</button></div></div></div>
 <div class="card"><h2>Clear all data</h2><p class="mu" style="margin-top:0">Removes every student and attendance record from this browser.</p><button class="btn dg" onclick="wipe()">${S.rs?"Tap again to confirm":"Clear all data"}</button></div>`}
 const db_json=()=>JSON.stringify(db);
 
+const FP="Poppins",FK="Kokila",DV=/[\u0900-\u097F]/,MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DEF={np:"उर्लाबारी बहुमुखी क्याम्पस",en:"Urlabari Multiple Campus",addr:"उर्लाबारी, मोरङ, कोशी प्रदेश, नेपाल  |  Urlabari, Morang, Koshi Province, Nepal"};
+const meta=()=>({...DEF,...(db.meta||{})});
+const FAC={BA:"Humanities",MA:"Humanities",BBS:"Management",MBS:"Management",BED:"Education",MED:"Education"};
+const fac=(p,c)=>p.startsWith("Level")?c:FAC[p];
+const LV=p=>p.startsWith("Level")?"Higher Secondary (+2)":["BA","BBS","BED"].includes(p)?"Bachelor’s":"Master’s";
+const SC={P:["FF1F7A4D","FFDDF1E6"],A:["FFB3261E","FFFADEDB"],L:["FF8A5A00","FFFBEBC8"],E:["FF2F5DA8","FFDFE8F7"]};
+const TEAL="FF0E5E63",solid=f=>({type:"pattern",pattern:"solid",fgColor:{argb:f}});
+const BD={style:"thin",color:{argb:"FFC9D5DA"}},BR={top:BD,left:BD,right:BD,bottom:BD};
+const PS={orientation:"landscape",fitToPage:true,fitToWidth:1,fitToHeight:0,paperSize:9};
+const bsNp=iso=>{const b=toBS(iso);return b?`${dn(b.d)} ${BSN[b.m]} ${dn(b.y)}`:iso};
+const per=()=>`Period: ${bsNp(S.from)} to ${bsNp(S.to)} BS   |   ${S.from} to ${S.to} AD`;
+function rt(t,sz,b,col){const runs=[];let cur=null;
+for(const ch of String(t)||" "){const dv=DV.test(ch),neu=/[\s\d\p{P}\p{S}]/u.test(ch),ty=dv?1:(neu&&cur?cur.t:0);
+if(!cur||cur.t!==ty){cur={t:ty,s:""};runs.push(cur)}cur.s+=ch}
+return{richText:runs.map(r=>({text:r.s,font:{name:r.t?FK:FP,size:r.t?sz+2:sz,bold:!!b,color:{argb:col||"FF112027"}}}))}}
+const uniq=(wb,s)=>{s=s.replace(/[\[\]:*?\/\\]/g,"-").slice(0,28);let n=s,i=2;while(wb.getWorksheet(n))n=s.slice(0,25)+" "+i++;return n};
+function mid(ws,C,r,v,sz,b,col,fill){ws.mergeCells(r,1,r,C);const c=ws.getCell(r,1);c.value=rt(v,sz,b,col);c.alignment={horizontal:"center",vertical:"middle",wrapText:true};if(fill)c.fill=solid(fill);ws.getRow(r).height=Math.round(sz*1.8)+8}
+function heading(ws,C,title,lines){const M=meta();
+mid(ws,C,1,M.np,22,true,TEAL);mid(ws,C,2,M.en,16,true);mid(ws,C,3,M.addr,10,false,"FF5B6D75");mid(ws,C,4,title,13,true,"FFFFFFFF",TEAL);
+lines.forEach((l,i)=>mid(ws,C,5+i,l,11,false,"FF112027","FFE1F1F2"));return 5+lines.length}
+function hcell(ws,r,i,v){const c=ws.getCell(r,i);c.value=rt(v,10,true,"FFFFFFFF");c.fill=solid(TEAL);c.alignment={horizontal:"center",vertical:"middle",wrapText:true};c.border=BR}
+function stat(p,c,sub){const k=K(p,c),ak=sub?k+"#"+sub:k,st=L(k),ds=dates(ak,S.from,S.to);if(!st.length||!ds.length)return null;
+const tot={P:0,A:0,L:0,E:0};st.forEach(s=>{const t=tally(ak,s.id,ds);for(const x in t)tot[x]+=t[x]});
+return{p,c,sub,ak,st,ds,n:st.length,avg:pct(tot)??0,low:st.filter(s=>(pct(tally(ak,s.id,ds))??100)<75).length}}
+function sheet(wb,s){const{p,c,sub,ak,st,ds}=s,n=ds.length,C=n+7,pr=PR.find(x=>x[0]===p);
+const ws=wb.addWorksheet(uniq(wb,p+" "+c+(sub?" - "+sub:"")),{views:[{state:"frozen",xSplit:2}],pageSetup:PS});
+let r=heading(ws,C,"Attendance Report  |  उपस्थिति प्रतिवेदन",[`Level: ${LV(p)}   |   Program: ${p} – ${pr[1]}`,`Faculty: ${fac(p,c)}   |   Class: ${c}`,`Subject: ${sub||"Daily attendance (whole class)"}`,per()])+1;
+const H=["Roll","Student Name",...ds.map(d=>{const b=toBS(d),a=new Date(d+"T00:00:00Z");return(b?`${dn(b.d)} ${BSN[b.m]}`:d.slice(5))+"\n"+a.getUTCDate()+" "+MON[a.getUTCMonth()]}),"Present","Absent","Late","Leave","Attendance %"];
+H.forEach((h,i)=>hcell(ws,r,i+1,h));ws.getRow(r).height=42;const hr=r;
+const l1=ws.getColumn(3).letter,l2=ws.getColumn(2+n).letter,lp=ws.getColumn(3+n).letter,la=ws.getColumn(4+n).letter,ll=ws.getColumn(5+n).letter;
+st.forEach(s0=>{r++;ws.getRow(r).height=21;
+let c0=ws.getCell(r,1);c0.value=s0.roll;c0.font={name:FP,size:10};c0.alignment={horizontal:"center",vertical:"middle"};c0.border=BR;
+c0=ws.getCell(r,2);c0.value=rt(s0.name,10,false);c0.alignment={vertical:"middle"};c0.border=BR;
+const t=tally(ak,s0.id,ds);
+ds.forEach((d,j)=>{const v=((db.att[ak]||{})[d]||{})[s0.id]||"",cc=ws.getCell(r,3+j),col=SC[v];cc.value=v||"–";cc.font={name:FP,size:10,bold:!!v,color:{argb:col?col[0]:"FF9AA9B0"}};if(col)cc.fill=solid(col[1]);cc.alignment={horizontal:"center",vertical:"middle"};cc.border=BR});
+["P","A","L","E"].forEach((x,j)=>{const cc=ws.getCell(r,3+n+j);cc.value={formula:`COUNTIF(${l1}${r}:${l2}${r},"${x}")`,result:t[x]};cc.font={name:FP,size:10};cc.alignment={horizontal:"center",vertical:"middle"};cc.border=BR});
+const pc=pct(t)||0,cp=ws.getCell(r,7+n);cp.value={formula:`IFERROR(ROUND((${lp}${r}+${ll}${r})/(${lp}${r}+${la}${r}+${ll}${r})*100,0),0)`,result:pc};
+cp.numFmt='0"%"';cp.font={name:FP,size:10,bold:true,color:{argb:pc<75?SC.A[0]:SC.P[0]}};cp.fill=solid(pc<75?SC.A[1]:SC.P[1]);cp.alignment={horizontal:"center",vertical:"middle"};cp.border=BR});
+const f1=hr+1,f2=hr+st.length;
+[["Present (P + L)",x=>x==="P"||x==="L",(cl)=>`COUNTIF(${cl}${f1}:${cl}${f2},"P")+COUNTIF(${cl}${f1}:${cl}${f2},"L")`],["Absent",x=>x==="A",(cl)=>`COUNTIF(${cl}${f1}:${cl}${f2},"A")`]].forEach(([lab,test,fm])=>{r++;
+const lc=ws.getCell(r,2);lc.value=rt(lab,10,true);lc.border=BR;lc.fill=solid("FFEEF3F5");ws.getCell(r,1).border=BR;ws.getCell(r,1).fill=solid("FFEEF3F5");
+ds.forEach((d,j)=>{const cc=ws.getCell(r,3+j),cl=ws.getColumn(3+j).letter;cc.value={formula:fm(cl),result:st.filter(x=>test(((db.att[ak]||{})[d]||{})[x.id])).length};cc.font={name:FP,size:10,bold:true};cc.alignment={horizontal:"center"};cc.border=BR;cc.fill=solid("FFEEF3F5")})});
+r+=2;mid(ws,C,r,`Class average: ${s.avg}%   |   Students below 75%: ${s.low}   |   Days recorded: ${n}   |   Students: ${st.length}`,11,true,TEAL);
+r++;mid(ws,C,r,"P = Present, A = Absent, L = Late, E = Leave.  Late counts as present; leave days are left out of the percentage.",9,false,"FF5B6D75");
+r++;mid(ws,C,r,`Generated on ${TD} AD (${bsNp(TD)} BS)`,9,false,"FF5B6D75");
+ws.getColumn(1).width=7;ws.getColumn(2).width=Math.min(40,Math.max(22,...st.map(x=>x.name.length*1.3)));
+for(let j=0;j<n;j++)ws.getColumn(3+j).width=9;for(let j=0;j<4;j++)ws.getColumn(3+n+j).width=10;ws.getColumn(7+n).width=15}
+function summary(wb,stats){const ws=wb.addWorksheet("Summary",{pageSetup:PS}),C=9;
+let r=heading(ws,C,"Attendance Summary  |  उपस्थिति सारांश",[per()])+1;
+["Level","Program","Faculty","Class","Subject","Students","Days recorded","Average %","Below 75%"].forEach((h,i)=>hcell(ws,r,i+1,h));ws.getRow(r).height=28;
+stats.forEach(s=>{r++;ws.getRow(r).height=21;[LV(s.p),s.p,fac(s.p,s.c),s.c,s.sub||"Daily (whole class)",s.n,s.ds.length,s.avg,s.low].forEach((v,i)=>{const c=ws.getCell(r,i+1),num=typeof v==="number";
+if(num)c.value=v;else c.value=rt(v,10,false);c.font=num?{name:FP,size:10}:c.font;c.alignment={horizontal:i>4?"center":"left",vertical:"middle"};c.border=BR;
+if(i===7){c.numFmt='0"%"';c.font={name:FP,size:10,bold:true,color:{argb:v<75?SC.A[0]:SC.P[0]}};c.fill=solid(v<75?SC.A[1]:SC.P[1])}})});
+[18,10,16,14,24,11,15,12,12].forEach((w,i)=>ws.getColumn(i+1).width=w)}
+async function xl(){
+if(typeof ExcelJS==="undefined"){toast("Excel library did not load. Check your internet");return}
+const jobs=[],add=(p,c,subs)=>subs.forEach(s=>jobs.push([p,c,s])),so=(p,c)=>S.xs?(db.subjects[K(p,c)]||[]):[];
+if(S.xt==="class")add(S.prog,S.cls,[S.sub]);
+else if(S.xt==="subj")add(S.prog,S.cls,["",...(db.subjects[K()]||[])]);
+else{const f=fac(S.prog,S.cls);PR.forEach(p=>p[2].forEach(c=>{if(S.xt==="all"||(S.xt==="prog"&&p[0]===S.prog)||(S.xt==="fac"&&fac(p[0],c)===f))add(p[0],c,["",...so(p[0],c)])}))}
+const stats=jobs.map(j=>stat(...j)).filter(Boolean);
+if(!stats.length){toast("No attendance saved for this selection and period");return}
+try{const wb=new ExcelJS.Workbook();wb.creator=meta().en;
+if(S.xt!=="class"&&stats.length>1)summary(wb,stats);
+stats.forEach(s=>sheet(wb,s));
+const buf=await wb.xlsx.writeBuffer(),cl=window.claude,dl=cl?await cl.use("downloads"):null;
+if(!dl){toast("Downloads are not available in this view");return}
+const nm={class:"Class",subj:"Subjects",prog:"Program",fac:"Faculty",all:"Campus"}[S.xt];
+await dl.save({filename:`Urlabari-Attendance-${nm}-${bsIso(S.from)}_to_${bsIso(S.to)}.xlsx`,data:new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})});
+toast("Excel file saved")}catch(e){toast(e&&e.code==="declined"?"Download cancelled":"Could not create the Excel file")}}
+function xcard(){const o=[["class","This class (selected subject or daily)"],["subj","This class: every subject"],["prog","Program or level: all classes"],["fac","Faculty: all classes ("+fac(S.prog,S.cls)+")"],["all","Whole campus: everything"]];
+return `<div class="card np"><h2>Download Excel</h2><label for="xt">What to export</label><select id="xt" onchange="S.xt=this.value;render()">${o.map(([v,l])=>`<option value="${v}" ${S.xt===v?"selected":""}>${l}</option>`).join("")}</select>${["prog","fac","all"].includes(S.xt)?`<label style="display:flex;gap:8px;align-items:center;margin:10px 0 0;font-weight:500"><input type="checkbox" style="width:auto;min-height:0" ${S.xs?"checked":""} onchange="S.xs=this.checked"> Add a sheet for each subject too</label>`:""}<p class="mu">Uses the date range above. Several classes give one sheet per class, with a summary sheet first.</p><button class="btn" onclick="xl()">Download Excel (.xlsx)</button></div>`}
+const subSel=()=>`<div class="full"><label for="sj">Subject</label><select id="sj" onchange="S.sub=this.value;ld();S.csv='';render()"><option value="">Whole class (daily attendance)</option>${(db.subjects[K()]||[]).map(s=>`<option ${s===S.sub?"selected":""}>${esc(s)}</option>`).join("")}</select></div>`;
+function scard(){const sb=db.subjects[K()]||[];return `<div class="card np"><h2>Subjects</h2><p class="mu" style="margin-top:0">Add subjects to take subject-wise attendance and export subject-wise reports.</p><div class="row"><div class="g"><label for="sb">Subject name</label><input id="sb" autocomplete="off" placeholder="e.g. Nepali, Accountancy"></div><button class="btn" onclick="addSub()">Add subject</button></div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${sb.length?sb.map((s,i)=>`<span class="pill" style="display:inline-flex;gap:4px;align-items:center;padding:2px 4px 2px 12px">${esc(s)}<button class="lk" style="font-size:18px;line-height:1;padding:4px 8px" aria-label="Remove ${esc(s)}" onclick="delSub(${i})">×</button></span>`).join(""):`<span class="mu">No subjects yet.</span>`}</div></div>`}
+function addSub(){const v=$("#sb").value.trim();if(!v){toast("Enter a subject name");return}const k=K();db.subjects[k]=db.subjects[k]||[];if(db.subjects[k].includes(v)){toast("Subject already added");return}db.subjects[k].push(v);save();render();toast("Subject added")}
+function delSub(i){const k=K(),s=db.subjects[k][i];db.subjects[k].splice(i,1);if(S.sub===s)S.sub="";save();render()}
+function mcard(){const M=meta();return `<div class="card"><h2>College details for Excel reports</h2><div style="display:grid;gap:10px"><div><label for="m1">College name (Nepali)</label><input id="m1" value="${esc(M.np)}"></div><div><label for="m2">College name (English)</label><input id="m2" value="${esc(M.en)}"></div><div><label for="m3">Address</label><input id="m3" value="${esc(M.addr)}"></div><div><button class="btn" onclick="saveMeta()">Save details</button></div></div></div>`}
+function saveMeta(){db.meta={np:$("#m1").value.trim()||DEF.np,en:$("#m2").value.trim()||DEF.en,addr:$("#m3").value.trim()||DEF.addr};save();toast("Details saved")}
 function render(){
 const nav=([id,l])=>`<button aria-current="${S.tab===id?"page":"false"}" onclick="go('${id}')">${svg(id)}<span>${l}</span></button>`;
 $("#side").innerHTML=`<div class="brand"><div class="logo">U</div><div><b>Urlabari Multiple Campus</b><span class="mu">Attendance register</span></div></div>`+TABS.map(nav).join("");
