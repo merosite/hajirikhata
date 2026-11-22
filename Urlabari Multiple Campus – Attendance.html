@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Urlabari Multiple Campus – Attendance</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#EEF3F5;--surface:#fff;--ink:#13242B;--muted:#5A6C74;--line:#D3DDE1;--brand:#0E5E63;--brand-ink:#fff;--p:#1F7A4D;--pb:#DDF1E6;--a:#B3261E;--ab:#FADEDB;--l:#8A5A00;--lb:#FBEBC8;--shadow:0 1px 2px rgba(19,36,43,.08);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1A1F;--surface:#17262D;--ink:#E7EFF2;--muted:#9BB0B8;--line:#2A3E47;--brand:#52B8BD;--brand-ink:#08262A;--p:#6FD3A0;--pb:#173A2A;--a:#FF9F97;--ab:#43201E;--l:#F2C265;--lb:#41320F;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F1A1F;--surface:#17262D;--ink:#E7EFF2;--muted:#9BB0B8;--line:#2A3E47;--brand:#52B8BD;--brand-ink:#08262A;--p:#6FD3A0;--pb:#173A2A;--a:#FF9F97;--ab:#43201E;--l:#F2C265;--lb:#41320F;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px 120px}
+header{padding:24px 0 8px}
+h1{font:700 clamp(24px,5vw,34px)/1.1 "Bricolage Grotesque",Georgia,serif;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:4px 0 0}
+nav{display:flex;gap:4px;margin:16px 0;border-bottom:1px solid var(--line);overflow-x:auto}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font:600 15px "Public Sans",sans-serif;color:var(--muted);cursor:pointer;white-space:nowrap}
+nav button[aria-selected=true]{color:var(--brand);border-color:var(--brand)}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.rail{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px 8px 0 0;padding:8px 14px;font:700 15px "Bricolage Grotesque",sans-serif;cursor:pointer;min-height:40px}
+.chip[aria-pressed=true]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+.chip.sm{border-radius:20px;font:500 14px "Public Sans",sans-serif;padding:6px 12px;min-height:36px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:16px;margin-top:12px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+label{font-weight:600;font-size:14px;display:block;margin-bottom:4px}
+input,textarea,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
+textarea{min-height:110px}
+.btn{background:var(--brand);color:var(--brand-ink);border:0;border-radius:8px;padding:10px 16px;font:600 15px "Public Sans",sans-serif;cursor:pointer;min-height:44px}
+.btn.alt{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+.btn.danger{background:var(--ab);color:var(--a)}
+.stu{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.stu:first-child{border-top:0}
+.roll{width:36px;color:var(--muted);font-variant-numeric:tabular-nums}
+.name{flex:1;font-weight:500;min-width:0;overflow-wrap:anywhere}
+.mk{display:flex;gap:6px}
+.mk button{width:44px;height:44px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font:700 16px "Public Sans",sans-serif;cursor:pointer}
+.mk button.P.on{background:var(--p);color:var(--brand-ink);border-color:var(--p)}
+.mk button.A.on{background:var(--a);color:var(--brand-ink);border-color:var(--a)}
+.mk button.L.on{background:var(--l);color:var(--brand-ink);border-color:var(--l)}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border-radius:20px;padding:4px 12px;font-weight:600;font-size:14px}
+.pill.P{background:var(--pb);color:var(--p)}.pill.A{background:var(--ab);color:var(--a)}.pill.L{background:var(--lb);color:var(--l)}.pill.U{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+.bar .in{max-width:980px;margin:0 auto;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td.P{color:var(--p);background:var(--pb);font-weight:700}td.A{color:var(--a);background:var(--ab);font-weight:700}td.L{color:var(--l);background:var(--lb);font-weight:700}
+.empty{text-align:center;padding:32px 12px;color:var(--muted)}
+.muted{color:var(--muted);font-size:14px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:8px;font-weight:600}
+h2{font:700 20px "Bricolage Grotesque",Georgia,serif;margin:0 0 8px}
+@media print{nav,.rail,.bar,.noprint{display:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Urlabari Multiple Campus</h1>
+<p class="sub">Student attendance register</p>
+</header>
+<nav role="tablist" id="tabs"></nav>
+<div id="ctx"></div>
+<main id="view"></main>
+</div>
+<div id="bar"></div>
+<div id="toast"></div>
+<script>
+const PROGRAMS=[
+{id:"BA",full:"Bachelor of Arts",classes:["1st Year","2nd Year","3rd Year","4th Year"]},
+{id:"BBS",full:"Bachelor of Business Studies",classes:["1st Year","2nd Year","3rd Year","4th Year"]},
+{id:"BED",full:"Bachelor of Education",classes:["1st Year","2nd Year","3rd Year","4th Year"]},
+{id:"MA",full:"Master of Arts",classes:["1st Year","2nd Year"]},
+{id:"MED",full:"Master of Education",classes:["1st Year","2nd Year"]},
+{id:"MBS",full:"Master of Business Studies",classes:["1st Year","2nd Year"]},
+{id:"Level 11",full:"Level 11 (+2)",classes:["Management","Education","Humanities","Science"]},
+{id:"Level 12",full:"Level 12 (+2)",classes:["Management","Education","Humanities","Science"]}
+];
+const SK="urlabari-attendance-v1";
+let db={students:{},att:{}};
+try{const r=JSON.parse(localStorage.getItem(SK));if(r&&r.students&&r.att)db=r}catch(e){}
+const persist=()=>{try{localStorage.setItem(SK,JSON.stringify(db))}catch(e){}};
+const pad=n=>String(n).padStart(2,"0");
+const nowD=new Date();
+const today=`${nowD.getFullYear()}-${pad(nowD.getMonth()+1)}-${pad(nowD.getDate())}`;
+const S={tab:"take",prog:"BA",cls:"1st Year",date:today,month:today.slice(0,7),draft:{},del:null,csv:""};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const key=(p=S.prog,c=S.cls)=>p+"|"+c;
+const list=(k=key())=>(db.students[k]||[]).slice().sort((a,b)=>a.roll-b.roll);
+const rec=(k=key(),d=S.date)=>(db.att[k]||{})[d]||{};
+const prog=()=>PROGRAMS.find(p=>p.id===S.prog);
+function loadDraft(){S.draft={...rec()};S.del=null}
+function keep(fn){const y=scrollY;fn();scrollTo(0,y)}
+function toast(m){const t=$("#toast");t.innerHTML=`<div class="toast">${esc(m)}</div>`;setTimeout(()=>t.innerHTML="",2200)}
+const TABS=[["take","Take attendance"],["students","Students"],["report","Monthly report"],["today","All classes"]];
+
+function setTab(t){S.tab=t;S.csv="";render()}
+function setProg(p){S.prog=p;S.cls=PROGRAMS.find(x=>x.id===p).classes[0];loadDraft();S.csv="";render()}
+function setCls(c){S.cls=c;loadDraft();S.csv="";render()}
+function setDate(v){if(!v)return;S.date=v;loadDraft();render()}
+function mark(id,v){S.draft[id]=S.draft[id]===v?undefined:v;if(!S.draft[id])delete S.draft[id];keep(render)}
+function markAll(v){list().forEach(s=>S.draft[s.id]=v);keep(render)}
+function saveAtt(){
+const k=key();db.att[k]=db.att[k]||{};
+if(Object.keys(S.draft).length)db.att[k][S.date]={...S.draft};else delete db.att[k][S.date];
+persist();toast("Attendance saved");render()}
+function addStudent(){
+const name=$("#nm").value.trim();if(!name){toast("Enter the student’s name");return}
+const k=key();db.students[k]=db.students[k]||[];
+const rollIn=parseInt($("#rl").value,10);
+const roll=rollIn>0?rollIn:Math.max(0,...db.students[k].map(s=>s.roll))+1;
+db.students[k].push({id:"s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),roll,name});
+persist();render();toast("Student added")}
+function bulkAdd(){
+const lines=$("#bulk").value.split("\n").map(l=>l.trim()).filter(Boolean);
+if(!lines.length){toast("Paste at least one name");return}
+const k=key();db.students[k]=db.students[k]||[];
+let next=Math.max(0,...db.students[k].map(s=>s.roll))+1;
+lines.forEach((l,i)=>{
+const m=l.match(/^(\d+)\s*[,\t.\-]\s*(.+)$/);
+const roll=m?+m[1]:next;const name=m?m[2]:l;
+if(roll>=next)next=roll+1;
+db.students[k].push({id:"s"+Date.now().toString(36)+i+Math.random().toString(36).slice(2,5),roll,name})});
+persist();render();toast(lines.length+" students added")}
+function delStudent(id){
+if(S.del!==id){S.del=id;render();return}
+const k=key();db.students[k]=db.students[k].filter(s=>s.id!==id);
+Object.values(db.att[k]||{}).forEach(d=>delete d[id]);
+S.del=null;persist();render()}
+function monthDays(){return Object.keys(db.att[key()]||{}).filter(d=>d.startsWith(S.month)).sort()}
+function buildCsv(){
+const ds=monthDays(),st=list();
+const rows=[["Roll","Name",...ds.map(d=>d.slice(8)),"Present","Absent","Late","Attendance %"]];
+st.forEach(s=>{const c=tally(s.id,ds);rows.push([s.roll,'"'+s.name.replace(/"/g,'""')+'"',...ds.map(d=>(db.att[key()][d][s.id]||"-")),c.P,c.A,c.L,c.pct])});
+return `Urlabari Multiple Campus,${S.prog} ${S.cls},${S.month}\n`+rows.map(r=>r.join(",")).join("\n")}
+function tally(id,ds){
+const c={P:0,A:0,L:0};ds.forEach(d=>{const v=db.att[key()][d][id];if(v)c[v]++});
+const t=c.P+c.A+c.L;c.pct=t?Math.round((c.P+c.L)*100/t):0;return c}
+function copyCsv(){
+S.csv=buildCsv();
+try{navigator.clipboard.writeText(S.csv).then(()=>toast("Copied. Paste into Excel or Sheets"),()=>{});}catch(e){}
+render()}
+
+function render(){
+$("#tabs").innerHTML=TABS.map(([id,l])=>`<button role="tab" aria-selected="${S.tab===id}" onclick="setTab('${id}')">${l}</button>`).join("");
+const showCtx=S.tab!=="today";
+$("#ctx").innerHTML=showCtx?`<div class="noprint"><div class="rail" role="group" aria-label="Program">${PROGRAMS.map(p=>`<button class="chip" aria-pressed="${S.prog===p.id}" onclick="setProg('${p.id}')">${p.id}</button>`).join("")}</div>
+<div class="rail" role="group" aria-label="Class">${prog().classes.map(c=>`<button class="chip sm" aria-pressed="${S.cls===c}" onclick="setCls('${c}')">${c}</button>`).join("")}</div>
+<p class="muted" style="margin:4px 0 0">${esc(prog().full)} · ${esc(S.cls)}</p></div>`:"";
+$("#bar").innerHTML="";
+$("#view").innerHTML=({take:vTake,students:vStudents,report:vReport,today:vToday})[S.tab]()}
+
+function vTake(){
+const st=list(),c={P:0,A:0,L:0};st.forEach(s=>{if(S.draft[s.id])c[S.draft[s.id]]++});
+const u=st.length-c.P-c.A-c.L;
+const dateF=`<div class="card"><div class="row"><div class="grow"><label for="dt">Date</label><input id="dt" type="date" value="${S.date}" max="${today}" onchange="setDate(this.value)"></div>
+<button class="btn alt" onclick="markAll('P')" style="align-self:end">Mark all present</button></div></div>`;
+if(!st.length)return dateF+`<div class="card empty"><p>No students in ${esc(S.prog)} · ${esc(S.cls)} yet.</p><button class="btn" onclick="setTab('students')">Add students</button></div>`;
+$("#bar").innerHTML=`<div class="bar"><div class="in"><div class="stats"><span class="pill P">Present ${c.P}</span><span class="pill A">Absent ${c.A}</span><span class="pill L">Late ${c.L}</span><span class="pill U">Not marked ${u}</span></div><button class="btn" onclick="saveAtt()">Save attendance</button></div></div>`;
+const saved=Object.keys(rec()).length?`<p class="muted">Attendance for this date was saved earlier. Saving again replaces it.</p>`:"";
+return dateF+`<div class="card">${saved}${st.map(s=>`<div class="stu"><span class="roll">${s.roll}</span><span class="name">${esc(s.name)}</span><div class="mk">${["P","A","L"].map(v=>`<button class="${v} ${S.draft[s.id]===v?"on":""}" aria-label="${{P:"Present",A:"Absent",L:"Late"}[v]}" aria-pressed="${S.draft[s.id]===v}" onclick="mark('${s.id}','${v}')">${v}</button>`).join("")}</div></div>`).join("")}</div>
+<p class="muted">P = Present, A = Absent, L = Late.</p>`}
+
+function vStudents(){
+const st=list();
+return `<div class="card"><h2>Add one student</h2><div class="row"><div style="width:90px"><label for="rl">Roll no.</label><input id="rl" type="number" min="1" placeholder="Auto"></div>
+<div class="grow"><label for="nm">Full name</label><input id="nm" type="text" autocomplete="off"></div><button class="btn" style="align-self:end" onclick="addStudent()">Add student</button></div></div>
+<div class="card"><h2>Paste a class list</h2><label for="bulk">One student per line. Use “roll, name” or just the name.</label><textarea id="bulk" placeholder="1, Anita Rai&#10;2, Bikash Limbu&#10;Sunita Karki"></textarea><div style="margin-top:10px"><button class="btn" onclick="bulkAdd()">Add list</button></div></div>
+<div class="card"><h2>${esc(S.prog)} · ${esc(S.cls)} (${st.length})</h2>${st.length?st.map(s=>`<div class="stu"><span class="roll">${s.roll}</span><span class="name">${esc(s.name)}</span><button class="btn ${S.del===s.id?"danger":"alt"}" onclick="delStudent('${s.id}')">${S.del===s.id?"Confirm remove":"Remove"}</button></div>`).join(""):`<p class="empty">No students yet. Add the first one above.</p>`}</div>`}
+
+function vReport(){
+const st=list(),ds=monthDays();
+const head=`<div class="card noprint"><div class="row"><div class="grow"><label for="mo">Month</label><input id="mo" type="month" value="${S.month}" onchange="S.month=this.value||S.month;S.csv='';render()"></div>
+<button class="btn alt" style="align-self:end" onclick="copyCsv()">Copy for Excel</button><button class="btn alt" style="align-self:end" onclick="print()">Print</button></div></div>`;
+if(!st.length||!ds.length)return head+`<div class="card empty">No attendance saved for ${esc(S.prog)} · ${esc(S.cls)} in this month.</div>`;
+const box=S.csv?`<div class="card noprint"><label for="csv">Select all and copy</label><textarea id="csv" readonly>${esc(S.csv)}</textarea></div>`:"";
+return head+box+`<div class="card scroll"><h2>${esc(S.prog)} · ${esc(S.cls)} · ${S.month}</h2><table><thead><tr><th>Student</th>${ds.map(d=>`<th>${d.slice(8)}</th>`).join("")}<th>P</th><th>A</th><th>L</th><th>%</th></tr></thead><tbody>${st.map(s=>{const c=tally(s.id,ds);return `<tr><td>${s.roll}. ${esc(s.name)}</td>${ds.map(d=>{const v=db.att[key()][d][s.id]||"";return `<td class="${v}">${v||"–"}</td>`}).join("")}<td>${c.P}</td><td>${c.A}</td><td>${c.L}</td><td><b>${c.pct}%</b></td></tr>`}).join("")}</tbody></table>
+<p class="muted">Late counts as present in the percentage.</p></div>`}
+
+function vToday(){
+const rows=[];
+PROGRAMS.forEach(p=>p.classes.forEach(c=>{
+const k=key(p.id,c),st=db.students[k]||[],r=rec(k,S.date),n={P:0,A:0,L:0};
+Object.values(r).forEach(v=>n[v]++);
+rows.push(`<tr><td>${esc(p.id)} · ${esc(c)}</td><td>${st.length}</td><td>${n.P}</td><td>${n.A}</td><td>${n.L}</td><td>${!st.length?"No students":Object.keys(r).length?"Taken":"Pending"}</td></tr>`)}));
+return `<div class="card"><label for="dt2">Date</label><input id="dt2" type="date" value="${S.date}" max="${today}" onchange="setDate(this.value)" style="max-width:220px"></div>
+<div class="card scroll"><table><thead><tr><th>Class</th><th>Students</th><th>Present</th><th>Absent</th><th>Late</th><th>Status</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>`}
+
+loadDraft();render();
+</script>
+</body>
+</html>
