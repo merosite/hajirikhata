@@ -4,197 +4,251 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Urlabari Multiple Campus – Attendance</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Public+Sans:wght@400;500;600;700&display=swap">
 <style>
-:root{--bg:#EEF3F5;--surface:#fff;--ink:#13242B;--muted:#5A6C74;--line:#D3DDE1;--brand:#0E5E63;--brand-ink:#fff;--p:#1F7A4D;--pb:#DDF1E6;--a:#B3261E;--ab:#FADEDB;--l:#8A5A00;--lb:#FBEBC8;--shadow:0 1px 2px rgba(19,36,43,.08);
+:root{--bg:#F0F4F6;--sf:#fff;--ink:#112027;--mu:#5B6D75;--ln:#D8E1E5;--br:#0E5E63;--bi:#fff;--bt:#E1F1F2;--p:#1F7A4D;--pb:#DDF1E6;--a:#B3261E;--ab:#FADEDB;--l:#8A5A00;--lb:#FBEBC8;--e:#2F5DA8;--eb:#DFE8F7;--sh:0 1px 3px rgba(17,32,39,.1);
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1A1F;--surface:#17262D;--ink:#E7EFF2;--muted:#9BB0B8;--line:#2A3E47;--brand:#52B8BD;--brand-ink:#08262A;--p:#6FD3A0;--pb:#173A2A;--a:#FF9F97;--ab:#43201E;--l:#F2C265;--lb:#41320F;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0F1A1F;--surface:#17262D;--ink:#E7EFF2;--muted:#9BB0B8;--line:#2A3E47;--brand:#52B8BD;--brand-ink:#08262A;--p:#6FD3A0;--pb:#173A2A;--a:#FF9F97;--ab:#43201E;--l:#F2C265;--lb:#41320F;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D171C;--sf:#15242B;--ink:#E8F0F3;--mu:#9CB0B8;--ln:#28393F;--br:#52B8BD;--bi:#08262A;--bt:#16353A;--p:#6FD3A0;--pb:#173A2A;--a:#FF9F97;--ab:#43201E;--l:#F2C265;--lb:#41320F;--e:#8DB4F2;--eb:#1B2D4A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0D171C;--sf:#15242B;--ink:#E8F0F3;--mu:#9CB0B8;--ln:#28393F;--br:#52B8BD;--bi:#08262A;--bt:#16353A;--p:#6FD3A0;--pb:#173A2A;--a:#FF9F97;--ab:#43201E;--l:#F2C265;--lb:#41320F;--e:#8DB4F2;--eb:#1B2D4A;color-scheme:dark}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
-.wrap{max-width:980px;margin:0 auto;padding:0 16px 120px}
-header{padding:24px 0 8px}
-h1{font:700 clamp(24px,5vw,34px)/1.1 "Bricolage Grotesque",Georgia,serif;margin:0;letter-spacing:-.01em}
-.sub{color:var(--muted);margin:4px 0 0}
-nav{display:flex;gap:4px;margin:16px 0;border-bottom:1px solid var(--line);overflow-x:auto}
-nav button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px;font:600 15px "Public Sans",sans-serif;color:var(--muted);cursor:pointer;white-space:nowrap}
-nav button[aria-selected=true]{color:var(--brand);border-color:var(--brand)}
-button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
-.rail{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px 8px 0 0;padding:8px 14px;font:700 15px "Bricolage Grotesque",sans-serif;cursor:pointer;min-height:40px}
-.chip[aria-pressed=true]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
-.chip.sm{border-radius:20px;font:500 14px "Public Sans",sans-serif;padding:6px 12px;min-height:36px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:16px;margin-top:12px}
-.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.grow{flex:1}
-label{font-weight:600;font-size:14px;display:block;margin-bottom:4px}
-input,textarea,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 11px;width:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--br);outline-offset:2px}
+.side{display:none}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--br);color:var(--bi);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--bi);color:var(--br);display:grid;place-items:center;font:700 18px "Bricolage Grotesque",serif;flex:none}
+.brand b{display:block;font:700 16px/1.15 "Bricolage Grotesque",Georgia,serif}
+.brand span{font-size:12px;opacity:.85}
+main{padding:16px 16px calc(150px + env(safe-area-inset-bottom,0px));max-width:1000px;margin:0 auto}
+h1{font:700 22px/1.2 "Bricolage Grotesque",Georgia,serif;margin:0 0 2px}
+h2{font:700 17px "Bricolage Grotesque",Georgia,serif;margin:0 0 10px}
+.mu{color:var(--mu);font-size:13px}
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--sf);border-top:1px solid var(--ln);display:flex;padding-bottom:env(safe-area-inset-bottom,0px)}
+.bnav button,.side button{background:none;border:0;cursor:pointer;color:var(--mu)}
+.bnav button{flex:1;padding:8px 2px 7px;font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:56px}
+.bnav button[aria-current=page]{color:var(--br)}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:12px;box-shadow:var(--sh);padding:14px;margin-top:12px}
+.ctx{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ctx .full{grid-column:1/-1}
+label{display:block;font-weight:600;font-size:13px;margin-bottom:4px}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--ln);border-radius:9px;padding:10px 12px;min-height:44px}
 textarea{min-height:110px}
-.btn{background:var(--brand);color:var(--brand-ink);border:0;border-radius:8px;padding:10px 16px;font:600 15px "Public Sans",sans-serif;cursor:pointer;min-height:44px}
-.btn.alt{background:transparent;color:var(--brand);border:1px solid var(--brand)}
-.btn.danger{background:var(--ab);color:var(--a)}
-.stu{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.btn{background:var(--br);color:var(--bi);border:0;border-radius:9px;padding:10px 16px;font-weight:600;cursor:pointer;min-height:44px}
+.btn.alt{background:none;color:var(--br);border:1px solid var(--br)}
+.btn.dg{background:var(--ab);color:var(--a)}
+.row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.g{flex:1;min-width:140px}
+.dt{display:flex;gap:6px}
+.dt button{width:44px;flex:none;background:var(--sf);border:1px solid var(--ln);border-radius:9px;cursor:pointer;font-size:18px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.kpi{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:12px;box-shadow:var(--sh)}
+.kpi b{display:block;font:700 26px/1.1 "Bricolage Grotesque",serif}
+.kpi span{font-size:12px;color:var(--mu)}
+.kpi.P b{color:var(--p)}.kpi.A b{color:var(--a)}.kpi.L b{color:var(--l)}
+.stu{padding:12px 0;border-top:1px solid var(--ln);display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
 .stu:first-child{border-top:0}
-.roll{width:36px;color:var(--muted);font-variant-numeric:tabular-nums}
-.name{flex:1;font-weight:500;min-width:0;overflow-wrap:anywhere}
-.mk{display:flex;gap:6px}
-.mk button{width:44px;height:44px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font:700 16px "Public Sans",sans-serif;cursor:pointer}
-.mk button.P.on{background:var(--p);color:var(--brand-ink);border-color:var(--p)}
-.mk button.A.on{background:var(--a);color:var(--brand-ink);border-color:var(--a)}
-.mk button.L.on{background:var(--l);color:var(--brand-ink);border-color:var(--l)}
-.stats{display:flex;gap:8px;flex-wrap:wrap}
-.pill{border-radius:20px;padding:4px 12px;font-weight:600;font-size:14px}
-.pill.P{background:var(--pb);color:var(--p)}.pill.A{background:var(--ab);color:var(--a)}.pill.L{background:var(--lb);color:var(--l)}.pill.U{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
-.bar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
-.bar .in{max-width:980px;margin:0 auto;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.scroll{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:14px}
-th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
-th:first-child,td:first-child{text-align:left}
-td.P{color:var(--p);background:var(--pb);font-weight:700}td.A{color:var(--a);background:var(--ab);font-weight:700}td.L{color:var(--l);background:var(--lb);font-weight:700}
-.empty{text-align:center;padding:32px 12px;color:var(--muted)}
-.muted{color:var(--muted);font-size:14px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:8px;font-weight:600}
-h2{font:700 20px "Bricolage Grotesque",Georgia,serif;margin:0 0 8px}
-@media print{nav,.rail,.bar,.noprint{display:none!important}}
+.av{width:38px;height:38px;border-radius:50%;color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
+.nm{flex:1;min-width:0;font-weight:600;overflow-wrap:anywhere}
+.nm small{display:block;font-weight:400;color:var(--mu);font-size:12px}
+.mk{display:flex;gap:6px;width:100%}
+.mk button{flex:1;min-height:44px;border:1px solid var(--ln);border-radius:9px;background:var(--bg);color:var(--mu);font-weight:600;font-size:13px;cursor:pointer}
+.mk .P.on{background:var(--p);border-color:var(--p);color:var(--bi)}.mk .A.on{background:var(--a);border-color:var(--a);color:var(--bi)}.mk .L.on{background:var(--l);border-color:var(--l);color:var(--bi)}.mk .E.on{background:var(--e);border-color:var(--e);color:var(--bi)}
+.pill{display:inline-block;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;background:var(--bg);color:var(--mu);border:1px solid var(--ln)}
+.pill.P{background:var(--pb);color:var(--p);border:0}.pill.A{background:var(--ab);color:var(--a);border:0}.pill.L{background:var(--lb);color:var(--l);border:0}.pill.E{background:var(--eb);color:var(--e);border:0}
+.save{position:fixed;left:0;right:0;bottom:calc(56px + env(safe-area-inset-bottom,0px));z-index:5;background:var(--sf);border-top:1px solid var(--ln);padding:10px 16px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.sc{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:8px 9px;border-bottom:1px solid var(--ln);text-align:center;white-space:nowrap}
+th{color:var(--mu);font-weight:600}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--sf)}
+td.P{color:var(--p);background:var(--pb);font-weight:700}td.A{color:var(--a);background:var(--ab);font-weight:700}td.L{color:var(--l);background:var(--lb);font-weight:700}td.E{color:var(--e);background:var(--eb);font-weight:700}
+.pg{height:8px;background:var(--bg);border-radius:6px;overflow:hidden;min-width:70px}.pg i{display:block;height:100%;background:var(--p)}
+.empty{text-align:center;color:var(--mu);padding:28px 8px}
+.lk{background:none;border:0;color:var(--br);font-weight:600;cursor:pointer;padding:0;text-align:left}
+.tw{display:flex;gap:6px}.tw button{flex:1}
+.bs{display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:8px}
+.cap{font-size:13px;color:var(--mu);margin-top:6px;line-height:1.4}.cap b{color:var(--ink)}
+.dt .dbtn{width:auto;flex:1;min-height:48px;text-align:left;padding:6px 12px;line-height:1.25;font-size:14px;color:var(--ink);background:var(--bg)}
+.dbtn b{display:block;font-size:15px}.dbtn small{display:block;color:var(--mu);font-size:12px}
+.cal{margin-top:8px;border:1px solid var(--ln);border-radius:12px;padding:10px;background:var(--sf)}
+.cal .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-weight:700;text-align:center}
+.cal .hd button{width:40px;height:40px;border-radius:9px;border:1px solid var(--ln);background:var(--bg);cursor:pointer;font-size:18px}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.cg .w{font-size:12px;color:var(--mu);font-weight:600;padding:4px 0}
+.cg .w.sat{color:var(--a)}
+.cg button{min-height:46px;border-radius:9px;border:1px solid transparent;background:var(--bg);cursor:pointer;padding:2px;line-height:1.15;font-weight:600}
+.cg button small{display:block;font-size:10px;font-weight:400;color:var(--mu)}
+.cg button.sat{color:var(--a)}
+.cg button.td{border-color:var(--br)}
+.cg button.sel{background:var(--br);color:var(--bi)}.cg button.sel small{color:var(--bi)}
+.cg button:disabled{opacity:.35;cursor:default}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(130px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:9px;font-weight:600;z-index:9}
+@media (min-width:900px){
+.side{display:flex;flex-direction:column;gap:4px;position:fixed;left:0;top:0;bottom:0;width:236px;background:var(--sf);border-right:1px solid var(--ln);padding:20px 12px}
+.side .brand{display:flex;gap:10px;align-items:center;padding:0 8px 18px}.side .logo{background:var(--br);color:var(--bi)}
+.side button{display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:9px;font-weight:600;font-size:15px;text-align:left}
+.side button[aria-current=page]{background:var(--bt);color:var(--br)}
+.top,.bnav{display:none}
+.wrap{margin-left:236px}
+main{padding-bottom:110px}
+.save{left:236px;bottom:0}
+.toast{bottom:90px}
+.kpis{grid-template-columns:repeat(5,1fr)}
+.ctx{grid-template-columns:1fr 1fr 1fr}.ctx .full{grid-column:auto}
+.mk{width:auto}.mk button{flex:none;padding:0 14px}
+.stu{flex-wrap:nowrap}
+}
+@media print{.side,.top,.bnav,.save,.np{display:none!important}.wrap{margin:0}}
 </style>
 </head>
 <body>
+<aside class="side" id="side"></aside>
 <div class="wrap">
-<header>
-<h1>Urlabari Multiple Campus</h1>
-<p class="sub">Student attendance register</p>
-</header>
-<nav role="tablist" id="tabs"></nav>
-<div id="ctx"></div>
+<header class="top"><div class="logo">U</div><div class="brand"><b>Urlabari Multiple Campus</b><span>Attendance register</span></div><div id="tdy" style="margin-left:auto;text-align:right;font-size:12px;line-height:1.3"></div></header>
 <main id="view"></main>
 </div>
 <div id="bar"></div>
+<nav class="bnav" id="bnav" aria-label="Main"></nav>
 <div id="toast"></div>
 <script>
-const PROGRAMS=[
-{id:"BA",full:"Bachelor of Arts",classes:["1st Year","2nd Year","3rd Year","4th Year"]},
-{id:"BBS",full:"Bachelor of Business Studies",classes:["1st Year","2nd Year","3rd Year","4th Year"]},
-{id:"BED",full:"Bachelor of Education",classes:["1st Year","2nd Year","3rd Year","4th Year"]},
-{id:"MA",full:"Master of Arts",classes:["1st Year","2nd Year"]},
-{id:"MED",full:"Master of Education",classes:["1st Year","2nd Year"]},
-{id:"MBS",full:"Master of Business Studies",classes:["1st Year","2nd Year"]},
-{id:"Level 11",full:"Level 11 (+2)",classes:["Management","Education","Humanities","Science"]},
-{id:"Level 12",full:"Level 12 (+2)",classes:["Management","Education","Humanities","Science"]}
-];
+const PR=[["BA","Bachelor of Arts",["1st Year","2nd Year","3rd Year","4th Year"]],["BBS","Bachelor of Business Studies",["1st Year","2nd Year","3rd Year","4th Year"]],["BED","Bachelor of Education",["1st Year","2nd Year","3rd Year","4th Year"]],["MA","Master of Arts",["1st Year","2nd Year"]],["MED","Master of Education",["1st Year","2nd Year"]],["MBS","Master of Business Studies",["1st Year","2nd Year"]],["Level 11","Level 11 (+2)",["Management","Education","Humanities","Science"]],["Level 12","Level 12 (+2)",["Management","Education","Humanities","Science"]]];
+const IC={dash:'<path d="M3 13h8V3H3zM13 21h8v-8h-8zM13 3v6h8V3zM3 21h8v-6H3z"/>',take:'<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',rep:'<path d="M18 20V10M12 20V4M6 20v-6"/>',set:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>'};
+const TABS=[["dash","Home"],["take","Attendance"],["stu","Students"],["rep","Reports"],["set","Settings"]];
 const SK="urlabari-attendance-v1";
 let db={students:{},att:{}};
 try{const r=JSON.parse(localStorage.getItem(SK));if(r&&r.students&&r.att)db=r}catch(e){}
-const persist=()=>{try{localStorage.setItem(SK,JSON.stringify(db))}catch(e){}};
-const pad=n=>String(n).padStart(2,"0");
-const nowD=new Date();
-const today=`${nowD.getFullYear()}-${pad(nowD.getMonth()+1)}-${pad(nowD.getDate())}`;
-const S={tab:"take",prog:"BA",cls:"1st Year",date:today,month:today.slice(0,7),draft:{},del:null,csv:""};
+const save=()=>{try{localStorage.setItem(SK,JSON.stringify(db))}catch(e){}};
+try{const t=localStorage.getItem("urlabari-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+const pd=n=>String(n).padStart(2,"0"),fmt=d=>`${d.getFullYear()}-${pd(d.getMonth()+1)}-${pd(d.getDate())}`;
+const TD=fmt(new Date());
+const BSD={2080:[31,32,31,32,31,30,30,30,29,29,30,30],2081:[31,31,32,32,31,30,30,30,29,30,30,30],2082:[30,32,31,32,31,30,30,30,29,30,30,30],2083:[31,31,32,31,31,30,30,30,29,30,30,30]};
+const BSM=["Baisakh","Jestha","Ashadh","Shrawan","Bhadra","Ashwin","Kartik","Mangsir","Poush","Magh","Falgun","Chaitra"];
+const BSN=["बैशाख","जेठ","असार","श्रावण","भदौ","असोज","कार्तिक","मंसिर","पौष","माघ","फागुन","चैत"];
+const WDE=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],WDN=["आइतबार","सोमबार","मंगलबार","बुधबार","बिहीबार","शुक्रबार","शनिबार"];
+const BS0=Date.UTC(2023,3,14);
+const dn=n=>String(n).replace(/\d/g,x=>"०१२३४५६७८९"[x]);
+const fu=t=>{const x=new Date(t);return `${x.getUTCFullYear()}-${pd(x.getUTCMonth()+1)}-${pd(x.getUTCDate())}`};
+function toBS(iso){const[y,m,d]=iso.split("-").map(Number);let n=Math.round((Date.UTC(y,m-1,d)-BS0)/864e5);if(n<0)return null;for(const yr in BSD){const ms=BSD[yr];for(let i=0;i<12;i++){if(n<ms[i])return{y:+yr,m:i,d:n+1};n-=ms[i]}}return null}
+function fromBS(y,m,d){let n=0;for(const yr in BSD){if(+yr===y){for(let i=0;i<m;i++)n+=BSD[yr][i];return fu(BS0+(n+d-1)*864e5)}n+=BSD[yr].reduce((a,b)=>a+b)}return null}
+const bsIso=iso=>{const b=toBS(iso);return b?`${b.y}-${pd(b.m+1)}-${pd(b.d)}`:iso};
+const bsShort=iso=>{const b=toBS(iso);return b?`${BSM[b.m].slice(0,3)} ${b.d}`:iso.slice(5)};
+function bsLabel(iso){const[y,m,d]=iso.split("-").map(Number),w=new Date(Date.UTC(y,m-1,d)).getUTCDay(),b=toBS(iso);return b?`<b>${WDE[w]}, ${b.d} ${BSM[b.m]} ${b.y} BS</b><br>${WDN[w]}, ${dn(b.d)} ${BSN[b.m]} ${dn(b.y)}`:`${WDE[w]} (BS date not available for this date)`}
+function setBS(y,m,d){y=+y;m=+m;d=Math.min(+d,BSD[y][m]);const iso=fromBS(y,m,d);if(iso)setDate(iso)}
+function calToggle(){S.co=!S.co;const b=toBS(S.date);S.cy=b?b.y:2083;S.cm=b?b.m:0;render()}
+function calNav(n){const i=Math.max(0,Math.min(47,(S.cy-2080)*12+S.cm+n));S.cy=2080+Math.floor(i/12);S.cm=i%12;render()}
+function calPick(iso){S.co=false;setDate(iso)}
+function dcard(){const wk=["आइत","सोम","मंगल","बुध","बिहि","शुक्र","शनि"];
+let h=`<div class="full"><label>Date (BS)</label><div class="dt"><button aria-label="Previous day" onclick="shift(-1)">‹</button><button class="dbtn" aria-expanded="${!!S.co}" onclick="calToggle()">${bsLabel(S.date).replace("<br>","<small>")}${bsLabel(S.date).includes("<br>")?"</small>":""}</button><button aria-label="Next day" onclick="shift(1)">›</button></div>`;
+if(S.co){const ms=BSD[S.cy][S.cm],[fy,fm,fd]=fromBS(S.cy,S.cm,1).split("-").map(Number),w0=new Date(Date.UTC(fy,fm-1,fd)).getUTCDay();
+h+=`<div class="cal"><div class="hd"><button aria-label="Previous month" onclick="calNav(-1)">‹</button><span>${BSN[S.cm]} ${dn(S.cy)}<small style="display:block;font-weight:400;color:var(--mu);font-size:12px">${BSM[S.cm]} ${S.cy}</small></span><button aria-label="Next month" onclick="calNav(1)">›</button></div><div class="cg">${wk.map((x,i)=>`<div class="w ${i===6?"sat":""}">${x}</div>`).join("")}${Array(w0).fill('<span></span>').join("")}`;
+for(let d=1;d<=ms;d++){const iso=fromBS(S.cy,S.cm,d),sat=(w0+d-1)%7===6;h+=`<button class="${iso===S.date?"sel ":""}${iso===TD?"td ":""}${sat?"sat":""}" ${iso>TD?"disabled":""} onclick="calPick('${iso}')">${dn(d)}<small>${+iso.slice(8)}</small></button>`}
+h+=`</div><div class="tw" style="margin-top:8px"><button class="btn alt" onclick="calPick('${TD}')">Today</button></div></div>`}
+return h+`<div class="cap">AD: ${S.date}</div></div>`}
+function bsSel(w){const b=toBS(S[w])||{y:2083,m:0,d:1},f=(y,m,d)=>`setRep('${w}',${y},${m},${d})`;
+return `<div class="bs"><select aria-label="${w} year" onchange="${f("this.value",b.m,b.d)}">${Object.keys(BSD).map(y=>`<option ${+y===b.y?"selected":""}>${y}</option>`).join("")}</select><select aria-label="${w} month" onchange="${f(b.y,"this.value",b.d)}">${BSM.map((n,i)=>`<option value="${i}" ${i===b.m?"selected":""}>${n}</option>`).join("")}</select><select aria-label="${w} day" onchange="${f(b.y,b.m,"this.value")}">${Array.from({length:BSD[b.y][b.m]},(_,i)=>`<option ${i+1===b.d?"selected":""}>${i+1}</option>`).join("")}</select></div><div class="cap">AD: ${S[w]}</div>`}
+function setRep(w,y,m,d){y=+y;m=+m;const iso=fromBS(y,m,Math.min(+d,BSD[y][m]));if(iso){S[w]=iso>TD?TD:iso;S.csv="";render()}}
+function dcardOld(){const b=toBS(S.date)||{y:2083,m:0,d:1};const nd=BSD[b.y][b.m];
+return `<div class="full"><label>Date (BS and AD)</label><div class="bs"><select aria-label="BS year" onchange="setBS(this.value,${b.m},${b.d})">${Object.keys(BSD).map(y=>`<option ${+y===b.y?"selected":""}>${y}</option>`).join("")}</select><select aria-label="BS month" onchange="setBS(${b.y},this.value,${b.d})">${BSM.map((n,i)=>`<option value="${i}" ${i===b.m?"selected":""}>${n}</option>`).join("")}</select><select aria-label="BS day" onchange="setBS(${b.y},${b.m},this.value)">${Array.from({length:nd},(_,i)=>`<option ${i+1===b.d?"selected":""}>${i+1}</option>`).join("")}</select></div><div class="dt" style="margin-top:8px"><button aria-label="Previous day" onclick="shift(-1)">‹</button><input type="date" aria-label="AD date" value="${S.date}" max="${TD}" onchange="setDate(this.value)"><button aria-label="Next day" onclick="shift(1)">›</button></div><div class="cap">${bsLabel(S.date)}</div></div>`}
+const S={tab:"dash",prog:"BA",cls:"1st Year",date:TD,from:TD.slice(0,8)+"01",to:TD,q:"",d:{},del:null,csv:"",json:"",rs:false};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const key=(p=S.prog,c=S.cls)=>p+"|"+c;
-const list=(k=key())=>(db.students[k]||[]).slice().sort((a,b)=>a.roll-b.roll);
-const rec=(k=key(),d=S.date)=>(db.att[k]||{})[d]||{};
-const prog=()=>PROGRAMS.find(p=>p.id===S.prog);
-function loadDraft(){S.draft={...rec()};S.del=null}
-function keep(fn){const y=scrollY;fn();scrollTo(0,y)}
-function toast(m){const t=$("#toast");t.innerHTML=`<div class="toast">${esc(m)}</div>`;setTimeout(()=>t.innerHTML="",2200)}
-const TABS=[["take","Take attendance"],["students","Students"],["report","Monthly report"],["today","All classes"]];
+const K=(p=S.prog,c=S.cls)=>p+"|"+c;
+const L=(k=K())=>(db.students[k]||[]).slice().sort((a,b)=>a.roll-b.roll);
+const R=(k=K(),d=S.date)=>(db.att[k]||{})[d]||{};
+const P=()=>PR.find(p=>p[0]===S.prog);
+const ini=n=>n.split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+const hue=n=>{let h=0;for(const c of n)h=(h*31+c.charCodeAt(0))%360;return h};
+const av=n=>`<div class="av" style="background:hsl(${hue(n)} 45% 38%)">${esc(ini(n))}</div>`;
+const svg=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[n]}</svg>`;
+const toast=m=>{$("#toast").innerHTML=`<div class="toast" role="status">${esc(m)}</div>`;setTimeout(()=>$("#toast").innerHTML="",2200)};
+const keep=f=>{const y=scrollY;f();scrollTo(0,y)};
+const pct=c=>{const t=c.P+c.A+c.L;return t?Math.round((c.P+c.L)*100/t):null};
+function tally(k,id,ds){const c={P:0,A:0,L:0,E:0};ds.forEach(d=>{const v=((db.att[k]||{})[d]||{})[id];if(v)c[v]++});return c}
+const dates=(k,f,t)=>Object.keys(db.att[k]||{}).filter(d=>d>=f&&d<=t).sort();
+function ld(){S.d={...R()};S.del=null;S.q=""}
+function go(t){S.tab=t;S.csv="";S.q="";S.del=null;render();scrollTo(0,0)}
+function pick(p,c){S.prog=p;S.cls=c||P()[2][0];ld();S.csv="";render()}
+function setDate(v){if(v){S.date=v>TD?TD:v;ld();render()}}
+function shift(n){const d=new Date(S.date+"T00:00");d.setDate(d.getDate()+n);setDate(fmt(d))}
+function openCls(p,c){S.prog=p;S.cls=c;ld();go("take")}
+function mark(id,v){if(S.d[id]===v)delete S.d[id];else S.d[id]=v;keep(render)}
+function markAll(v){L().forEach(s=>S.d[s.id]=v);keep(render)}
+function clearAll(){S.d={};keep(render)}
+function saveAtt(){const k=K();db.att[k]=db.att[k]||{};if(Object.keys(S.d).length)db.att[k][S.date]={...S.d};else delete db.att[k][S.date];save();toast("Attendance saved");render()}
+function addStu(){const n=$("#nm").value.trim();if(!n){toast("Enter the student’s name");return}
+const k=K();db.students[k]=db.students[k]||[];const r=parseInt($("#rl").value,10);
+db.students[k].push({id:"s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),roll:r>0?r:Math.max(0,...db.students[k].map(s=>s.roll))+1,name:n,phone:$("#ph").value.trim()});
+save();render();toast("Student added")}
+function bulk(){const ls=$("#bk").value.split("\n").map(l=>l.trim()).filter(Boolean);if(!ls.length){toast("Paste at least one name");return}
+const k=K();db.students[k]=db.students[k]||[];let nx=Math.max(0,...db.students[k].map(s=>s.roll))+1;
+ls.forEach((l,i)=>{const m=l.match(/^(\d+)\s*[,\t.\-]\s*(.+)$/);const r=m?+m[1]:nx;if(r>=nx)nx=r+1;db.students[k].push({id:"s"+Date.now().toString(36)+i+Math.random().toString(36).slice(2,4),roll:r,name:m?m[2]:l,phone:""})});
+save();render();toast(ls.length+" students added")}
+function del(id){if(S.del!==id){S.del=id;fill();return}const k=K();db.students[k]=db.students[k].filter(s=>s.id!==id);Object.values(db.att[k]||{}).forEach(d=>delete d[id]);S.del=null;save();render()}
+function csv(){const k=K(),ds=dates(k,S.from,S.to);const rows=[["Roll","Name",...ds.map(bsIso),"Present","Absent","Late","Leave","Attendance %"]];
+L().forEach(s=>{const c=tally(k,s.id,ds);rows.push([s.roll,'"'+s.name.replace(/"/g,'""')+'"',...ds.map(d=>db.att[k][d][s.id]||"-"),c.P,c.A,c.L,c.E,pct(c)==null?"":pct(c)])});
+return `Urlabari Multiple Campus,${S.prog} ${S.cls},BS ${bsIso(S.from)} to ${bsIso(S.to)} (AD ${S.from} to ${S.to})\n`+rows.map(r=>r.join(",")).join("\n")}
+function copy(t,m){try{navigator.clipboard.writeText(t).then(()=>toast(m),()=>{})}catch(e){}}
+function theme(t){const r=document.documentElement;if(t==="auto")delete r.dataset.theme;else r.dataset.theme=t;try{t==="auto"?localStorage.removeItem("urlabari-theme"):localStorage.setItem("urlabari-theme",t)}catch(e){}}
+function restore(){try{const j=JSON.parse($("#rj").value);if(!j.students||!j.att)throw 0;db=j;save();ld();toast("Backup restored");render()}catch(e){toast("That backup is not valid")}}
+function wipe(){if(!S.rs){S.rs=true;render();return}db={students:{},att:{}};save();S.rs=false;ld();toast("All data cleared");render()}
 
-function setTab(t){S.tab=t;S.csv="";render()}
-function setProg(p){S.prog=p;S.cls=PROGRAMS.find(x=>x.id===p).classes[0];loadDraft();S.csv="";render()}
-function setCls(c){S.cls=c;loadDraft();S.csv="";render()}
-function setDate(v){if(!v)return;S.date=v;loadDraft();render()}
-function mark(id,v){S.draft[id]=S.draft[id]===v?undefined:v;if(!S.draft[id])delete S.draft[id];keep(render)}
-function markAll(v){list().forEach(s=>S.draft[s.id]=v);keep(render)}
-function saveAtt(){
-const k=key();db.att[k]=db.att[k]||{};
-if(Object.keys(S.draft).length)db.att[k][S.date]={...S.draft};else delete db.att[k][S.date];
-persist();toast("Attendance saved");render()}
-function addStudent(){
-const name=$("#nm").value.trim();if(!name){toast("Enter the student’s name");return}
-const k=key();db.students[k]=db.students[k]||[];
-const rollIn=parseInt($("#rl").value,10);
-const roll=rollIn>0?rollIn:Math.max(0,...db.students[k].map(s=>s.roll))+1;
-db.students[k].push({id:"s"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),roll,name});
-persist();render();toast("Student added")}
-function bulkAdd(){
-const lines=$("#bulk").value.split("\n").map(l=>l.trim()).filter(Boolean);
-if(!lines.length){toast("Paste at least one name");return}
-const k=key();db.students[k]=db.students[k]||[];
-let next=Math.max(0,...db.students[k].map(s=>s.roll))+1;
-lines.forEach((l,i)=>{
-const m=l.match(/^(\d+)\s*[,\t.\-]\s*(.+)$/);
-const roll=m?+m[1]:next;const name=m?m[2]:l;
-if(roll>=next)next=roll+1;
-db.students[k].push({id:"s"+Date.now().toString(36)+i+Math.random().toString(36).slice(2,5),roll,name})});
-persist();render();toast(lines.length+" students added")}
-function delStudent(id){
-if(S.del!==id){S.del=id;render();return}
-const k=key();db.students[k]=db.students[k].filter(s=>s.id!==id);
-Object.values(db.att[k]||{}).forEach(d=>delete d[id]);
-S.del=null;persist();render()}
-function monthDays(){return Object.keys(db.att[key()]||{}).filter(d=>d.startsWith(S.month)).sort()}
-function buildCsv(){
-const ds=monthDays(),st=list();
-const rows=[["Roll","Name",...ds.map(d=>d.slice(8)),"Present","Absent","Late","Attendance %"]];
-st.forEach(s=>{const c=tally(s.id,ds);rows.push([s.roll,'"'+s.name.replace(/"/g,'""')+'"',...ds.map(d=>(db.att[key()][d][s.id]||"-")),c.P,c.A,c.L,c.pct])});
-return `Urlabari Multiple Campus,${S.prog} ${S.cls},${S.month}\n`+rows.map(r=>r.join(",")).join("\n")}
-function tally(id,ds){
-const c={P:0,A:0,L:0};ds.forEach(d=>{const v=db.att[key()][d][id];if(v)c[v]++});
-const t=c.P+c.A+c.L;c.pct=t?Math.round((c.P+c.L)*100/t):0;return c}
-function copyCsv(){
-S.csv=buildCsv();
-try{navigator.clipboard.writeText(S.csv).then(()=>toast("Copied. Paste into Excel or Sheets"),()=>{});}catch(e){}
-render()}
+function ctx(withDate){return `<div class="card np"><div class="ctx"><div><label for="pg">Program</label><select id="pg" onchange="pick(this.value)">${PR.map(p=>`<option ${p[0]===S.prog?"selected":""}>${p[0]}</option>`).join("")}</select></div>
+<div><label for="cl">${S.prog.startsWith("Level")?"Faculty":"Class"}</label><select id="cl" onchange="pick(S.prog,this.value)">${P()[2].map(c=>`<option ${c===S.cls?"selected":""}>${c}</option>`).join("")}</select></div>
+${withDate?dcard():""}</div></div>`}
+
+function vDash(){
+let t=0,c={P:0,A:0,L:0,E:0},rows=[],low=[];
+PR.forEach(p=>p[2].forEach(cl=>{const k=K(p[0],cl),st=db.students[k]||[],r=R(k,S.date),n={P:0,A:0,L:0,E:0};t+=st.length;Object.values(r).forEach(v=>{n[v]++;c[v]++});
+const r2=pct(n);rows.push(`<tr><td><button class="lk" onclick="openCls('${p[0]}','${cl}')">${esc(p[0])} · ${esc(cl)}</button></td><td>${st.length}</td><td>${n.P+n.L}</td><td>${n.A}</td><td>${st.length?(Object.keys(r).length?`<span class="pill P">Done</span>`:`<span class="pill L">Pending</span>`):`<span class="pill">No students</span>`}</td></tr>`);
+const ds=dates(k,"0000","9999");if(ds.length>=3)st.forEach(s=>{const q=pct(tally(k,s.id,ds));if(q!=null&&q<75)low.push({s,q,p:p[0],cl})})}));
+low.sort((a,b)=>a.q-b.q);const rate=pct(c);
+return `<h1>Dashboard</h1><p class="mu" style="margin:0">Overview for the selected day</p>
+<div class="card np"><div class="ctx">${dcard()}</div></div>
+<div class="kpis"><div class="kpi"><b>${t}</b><span>Total students</span></div><div class="kpi P"><b>${c.P+c.L}</b><span>Present (incl. late)</span></div><div class="kpi A"><b>${c.A}</b><span>Absent</span></div><div class="kpi L"><b>${c.L}</b><span>Late</span></div><div class="kpi"><b>${rate==null?"–":rate+"%"}</b><span>Attendance rate</span></div></div>
+<div class="card"><h2>Classes</h2>${t?`<div class="sc"><table><thead><tr><th>Class</th><th>Students</th><th>Present</th><th>Absent</th><th>Status</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>`:`<div class="empty">No students yet.<br><br><button class="btn" onclick="go('stu')">Add students</button></div>`}</div>
+<div class="card"><h2>Below 75% attendance</h2>${low.length?low.slice(0,10).map(x=>`<div class="stu">${av(x.s.name)}<div class="nm">${esc(x.s.name)}<small>${esc(x.p)} · ${esc(x.cl)}</small></div><span class="pill A">${x.q}%</span></div>`).join(""):`<p class="mu" style="margin:0">No students are below 75%, or fewer than 3 days are recorded.</p>`}</div>`}
+
+function vTake(){return `<h1>Take attendance</h1>`+ctx(true)+`<div class="card" id="tk"></div>`}
+function fillTake(){
+const st=L(),q=S.q.toLowerCase(),c={P:0,A:0,L:0,E:0};st.forEach(s=>{if(S.d[s.id])c[S.d[s.id]]++});
+const u=st.length-c.P-c.A-c.L-c.E;
+$("#bar").innerHTML=st.length?`<div class="save"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill P">P ${c.P}</span><span class="pill A">A ${c.A}</span><span class="pill L">L ${c.L}</span><span class="pill E">Leave ${c.E}</span><span class="pill">Left ${u}</span></div><button class="btn" onclick="saveAtt()">Save attendance</button></div>`:"";
+if(!st.length){$("#tk").innerHTML=`<div class="empty">No students in ${esc(S.prog)} · ${esc(S.cls)} yet.<br><br><button class="btn" onclick="go('stu')">Add students</button></div>`;return}
+const was=Object.keys(R()).length?`<p class="mu" style="margin:0 0 8px">Attendance for this date is already saved. Saving again replaces it.</p>`:"";
+const rows=st.filter(s=>!q||s.name.toLowerCase().includes(q)||String(s.roll)===q);
+$("#tk").innerHTML=was+`<div class="row np" style="margin-bottom:6px"><div class="g"><input id="sq" type="search" placeholder="Search name or roll" value="${esc(S.q)}" oninput="S.q=this.value;fillRows()" aria-label="Search students"></div></div><div class="tw np" style="margin-bottom:6px"><button class="btn alt" onclick="markAll('P')">All present</button><button class="btn alt" onclick="clearAll()">Clear</button></div><div id="rw"></div>`;fillRows()}
+function fillRows(){const q=S.q.toLowerCase();const rows=L().filter(s=>!q||s.name.toLowerCase().includes(q)||String(s.roll)===q);
+$("#rw").innerHTML=rows.length?rows.map(s=>`<div class="stu">${av(s.name)}<div class="nm">${esc(s.name)}<small>Roll ${s.roll}</small></div><div class="mk">${[["P","Present"],["A","Absent"],["L","Late"],["E","Leave"]].map(([v,l])=>`<button class="${v} ${S.d[s.id]===v?"on":""}" aria-pressed="${S.d[s.id]===v}" onclick="mark('${s.id}','${v}')">${l}</button>`).join("")}</div></div>`).join(""):`<div class="empty">No match.</div>`}
+
+function vStu(){return `<h1>Students</h1>`+ctx(false)+`<div class="card np"><h2>Add a student</h2><div class="row"><div style="width:90px"><label for="rl">Roll</label><input id="rl" type="number" min="1" placeholder="Auto"></div><div class="g"><label for="nm">Full name</label><input id="nm" autocomplete="off"></div><div class="g"><label for="ph">Guardian phone</label><input id="ph" type="tel" placeholder="Optional"></div><button class="btn" onclick="addStu()">Add student</button></div></div>
+<div class="card np"><h2>Paste a class list</h2><label for="bk">One per line: “roll, name” or just the name</label><textarea id="bk" placeholder="1, Anita Rai&#10;2, Bikash Limbu&#10;Sunita Karki"></textarea><div style="margin-top:10px"><button class="btn" onclick="bulk()">Add list</button></div></div><div class="card"><h2>${esc(S.prog)} · ${esc(S.cls)} (${L().length})</h2><input id="sq" type="search" placeholder="Search name or roll" value="${esc(S.q)}" oninput="S.q=this.value;fill()" aria-label="Search students" style="margin-bottom:6px"><div id="rw"></div></div>`}
+function fill(){const k=K(),q=S.q.toLowerCase(),ds=dates(k,"0000","9999");const rows=L().filter(s=>!q||s.name.toLowerCase().includes(q)||String(s.roll)===q);
+$("#rw").innerHTML=rows.length?rows.map(s=>{const p=pct(tally(k,s.id,ds));return `<div class="stu">${av(s.name)}<div class="nm">${esc(s.name)}<small>Roll ${s.roll}${s.phone?" · "+esc(s.phone):""}${p==null?"":" · "+p+"% attendance"}</small></div><button class="btn ${S.del===s.id?"dg":"alt"}" onclick="del('${s.id}')">${S.del===s.id?"Confirm remove":"Remove"}</button></div>`}).join(""):`<div class="empty">No students yet.</div>`}
+
+function vRep(){const k=K(),ds=dates(k,S.from,S.to),st=L();
+const head=`<h1>Reports</h1>`+ctx(false)+`<div class="card np"><div class="row"><div class="g" style="min-width:240px"><label>From (BS)</label>${bsSel("from")}</div><div class="g" style="min-width:240px"><label>To (BS)</label>${bsSel("to")}</div></div><div class="tw" style="margin-top:10px"><button class="btn alt" onclick="S.csv=csv();copy(S.csv,'Copied. Paste into Excel or Sheets');render()">Copy for Excel</button><button class="btn alt" onclick="print()">Print</button></div></div>`;
+if(!st.length||!ds.length)return head+`<div class="card empty">No attendance saved for this class in this period.</div>`;
+let tot={P:0,A:0,L:0,E:0};st.forEach(s=>{const c=tally(k,s.id,ds);for(const x in c)tot[x]+=c[x]});
+return head+(S.csv?`<div class="card np"><label for="cv">Select all and copy</label><textarea id="cv" readonly>${esc(S.csv)}</textarea></div>`:"")+`<div class="kpis"><div class="kpi"><b>${ds.length}</b><span>Days recorded</span></div><div class="kpi"><b>${pct(tot)}%</b><span>Class average</span></div><div class="kpi A"><b>${st.filter(s=>pct(tally(k,s.id,ds))<75).length}</b><span>Below 75%</span></div></div>
+<div class="card sc"><h2>${esc(S.prog)} · ${esc(S.cls)}</h2><table><thead><tr><th>Student</th>${ds.map(d=>`<th title="${d}">${bsShort(d)}</th>`).join("")}<th>P</th><th>A</th><th>L</th><th>Lv</th><th>%</th></tr></thead><tbody>${st.map(s=>{const c=tally(k,s.id,ds),p=pct(c);return `<tr><td>${s.roll}. ${esc(s.name)}</td>${ds.map(d=>{const v=db.att[k][d][s.id]||"";return `<td class="${v}">${v||"–"}</td>`}).join("")}<td>${c.P}</td><td>${c.A}</td><td>${c.L}</td><td>${c.E}</td><td><span class="pill ${p!=null&&p<75?"A":"P"}">${p==null?"–":p+"%"}</span></td></tr>`}).join("")}</tbody></table><p class="mu">P present, A absent, L late, Lv leave. Late counts as present; leave days are left out of the percentage.</p></div>`}
+
+function vSet(){const th=document.documentElement.dataset.theme||"auto";const bk=JSON.stringify(db);
+return `<h1>Settings</h1><div class="card"><h2>Appearance</h2><div class="tw">${["auto","light","dark"].map(t=>`<button class="btn ${th===t?"":"alt"}" onclick="theme('${t}');render()">${t[0].toUpperCase()+t.slice(1)}</button>`).join("")}</div></div>
+<div class="card"><h2>Backup</h2><p class="mu" style="margin-top:0">Records live in this browser only. Copy a backup regularly and keep it somewhere safe.</p><button class="btn" onclick="copy(db_json(),'Backup copied')">Copy backup</button><div style="margin-top:14px"><label for="rj">Restore from backup</label><textarea id="rj" placeholder="Paste a backup here"></textarea><div style="margin-top:10px"><button class="btn alt" onclick="restore()">Restore backup</button></div></div></div>
+<div class="card"><h2>Clear all data</h2><p class="mu" style="margin-top:0">Removes every student and attendance record from this browser.</p><button class="btn dg" onclick="wipe()">${S.rs?"Tap again to confirm":"Clear all data"}</button></div>`}
+const db_json=()=>JSON.stringify(db);
 
 function render(){
-$("#tabs").innerHTML=TABS.map(([id,l])=>`<button role="tab" aria-selected="${S.tab===id}" onclick="setTab('${id}')">${l}</button>`).join("");
-const showCtx=S.tab!=="today";
-$("#ctx").innerHTML=showCtx?`<div class="noprint"><div class="rail" role="group" aria-label="Program">${PROGRAMS.map(p=>`<button class="chip" aria-pressed="${S.prog===p.id}" onclick="setProg('${p.id}')">${p.id}</button>`).join("")}</div>
-<div class="rail" role="group" aria-label="Class">${prog().classes.map(c=>`<button class="chip sm" aria-pressed="${S.cls===c}" onclick="setCls('${c}')">${c}</button>`).join("")}</div>
-<p class="muted" style="margin:4px 0 0">${esc(prog().full)} · ${esc(S.cls)}</p></div>`:"";
+const nav=([id,l])=>`<button aria-current="${S.tab===id?"page":"false"}" onclick="go('${id}')">${svg(id)}<span>${l}</span></button>`;
+$("#side").innerHTML=`<div class="brand"><div class="logo">U</div><div><b>Urlabari Multiple Campus</b><span class="mu">Attendance register</span></div></div>`+TABS.map(nav).join("");
+$("#bnav").innerHTML=TABS.map(nav).join("");
 $("#bar").innerHTML="";
-$("#view").innerHTML=({take:vTake,students:vStudents,report:vReport,today:vToday})[S.tab]()}
-
-function vTake(){
-const st=list(),c={P:0,A:0,L:0};st.forEach(s=>{if(S.draft[s.id])c[S.draft[s.id]]++});
-const u=st.length-c.P-c.A-c.L;
-const dateF=`<div class="card"><div class="row"><div class="grow"><label for="dt">Date</label><input id="dt" type="date" value="${S.date}" max="${today}" onchange="setDate(this.value)"></div>
-<button class="btn alt" onclick="markAll('P')" style="align-self:end">Mark all present</button></div></div>`;
-if(!st.length)return dateF+`<div class="card empty"><p>No students in ${esc(S.prog)} · ${esc(S.cls)} yet.</p><button class="btn" onclick="setTab('students')">Add students</button></div>`;
-$("#bar").innerHTML=`<div class="bar"><div class="in"><div class="stats"><span class="pill P">Present ${c.P}</span><span class="pill A">Absent ${c.A}</span><span class="pill L">Late ${c.L}</span><span class="pill U">Not marked ${u}</span></div><button class="btn" onclick="saveAtt()">Save attendance</button></div></div>`;
-const saved=Object.keys(rec()).length?`<p class="muted">Attendance for this date was saved earlier. Saving again replaces it.</p>`:"";
-return dateF+`<div class="card">${saved}${st.map(s=>`<div class="stu"><span class="roll">${s.roll}</span><span class="name">${esc(s.name)}</span><div class="mk">${["P","A","L"].map(v=>`<button class="${v} ${S.draft[s.id]===v?"on":""}" aria-label="${{P:"Present",A:"Absent",L:"Late"}[v]}" aria-pressed="${S.draft[s.id]===v}" onclick="mark('${s.id}','${v}')">${v}</button>`).join("")}</div></div>`).join("")}</div>
-<p class="muted">P = Present, A = Absent, L = Late.</p>`}
-
-function vStudents(){
-const st=list();
-return `<div class="card"><h2>Add one student</h2><div class="row"><div style="width:90px"><label for="rl">Roll no.</label><input id="rl" type="number" min="1" placeholder="Auto"></div>
-<div class="grow"><label for="nm">Full name</label><input id="nm" type="text" autocomplete="off"></div><button class="btn" style="align-self:end" onclick="addStudent()">Add student</button></div></div>
-<div class="card"><h2>Paste a class list</h2><label for="bulk">One student per line. Use “roll, name” or just the name.</label><textarea id="bulk" placeholder="1, Anita Rai&#10;2, Bikash Limbu&#10;Sunita Karki"></textarea><div style="margin-top:10px"><button class="btn" onclick="bulkAdd()">Add list</button></div></div>
-<div class="card"><h2>${esc(S.prog)} · ${esc(S.cls)} (${st.length})</h2>${st.length?st.map(s=>`<div class="stu"><span class="roll">${s.roll}</span><span class="name">${esc(s.name)}</span><button class="btn ${S.del===s.id?"danger":"alt"}" onclick="delStudent('${s.id}')">${S.del===s.id?"Confirm remove":"Remove"}</button></div>`).join(""):`<p class="empty">No students yet. Add the first one above.</p>`}</div>`}
-
-function vReport(){
-const st=list(),ds=monthDays();
-const head=`<div class="card noprint"><div class="row"><div class="grow"><label for="mo">Month</label><input id="mo" type="month" value="${S.month}" onchange="S.month=this.value||S.month;S.csv='';render()"></div>
-<button class="btn alt" style="align-self:end" onclick="copyCsv()">Copy for Excel</button><button class="btn alt" style="align-self:end" onclick="print()">Print</button></div></div>`;
-if(!st.length||!ds.length)return head+`<div class="card empty">No attendance saved for ${esc(S.prog)} · ${esc(S.cls)} in this month.</div>`;
-const box=S.csv?`<div class="card noprint"><label for="csv">Select all and copy</label><textarea id="csv" readonly>${esc(S.csv)}</textarea></div>`:"";
-return head+box+`<div class="card scroll"><h2>${esc(S.prog)} · ${esc(S.cls)} · ${S.month}</h2><table><thead><tr><th>Student</th>${ds.map(d=>`<th>${d.slice(8)}</th>`).join("")}<th>P</th><th>A</th><th>L</th><th>%</th></tr></thead><tbody>${st.map(s=>{const c=tally(s.id,ds);return `<tr><td>${s.roll}. ${esc(s.name)}</td>${ds.map(d=>{const v=db.att[key()][d][s.id]||"";return `<td class="${v}">${v||"–"}</td>`}).join("")}<td>${c.P}</td><td>${c.A}</td><td>${c.L}</td><td><b>${c.pct}%</b></td></tr>`}).join("")}</tbody></table>
-<p class="muted">Late counts as present in the percentage.</p></div>`}
-
-function vToday(){
-const rows=[];
-PROGRAMS.forEach(p=>p.classes.forEach(c=>{
-const k=key(p.id,c),st=db.students[k]||[],r=rec(k,S.date),n={P:0,A:0,L:0};
-Object.values(r).forEach(v=>n[v]++);
-rows.push(`<tr><td>${esc(p.id)} · ${esc(c)}</td><td>${st.length}</td><td>${n.P}</td><td>${n.A}</td><td>${n.L}</td><td>${!st.length?"No students":Object.keys(r).length?"Taken":"Pending"}</td></tr>`)}));
-return `<div class="card"><label for="dt2">Date</label><input id="dt2" type="date" value="${S.date}" max="${today}" onchange="setDate(this.value)" style="max-width:220px"></div>
-<div class="card scroll"><table><thead><tr><th>Class</th><th>Students</th><th>Present</th><th>Absent</th><th>Late</th><th>Status</th></tr></thead><tbody>${rows.join("")}</tbody></table></div>`}
-
-loadDraft();render();
+$("#view").innerHTML=({dash:vDash,take:vTake,stu:vStu,rep:vRep,set:vSet})[S.tab]();
+if(S.tab==="take")fillTake();if(S.tab==="stu")fill()}
+ld();render();
+$("#tdy").innerHTML=(()=>{const b=toBS(TD);return b?`Today<br><b>${b.d} ${BSM[b.m]} ${b.y}</b>`:""})();
 </script>
 </body>
 </html>
